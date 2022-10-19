@@ -29,5 +29,4 @@ public class Book {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "book", fetch = FetchType.LAZY)
     private List<Resource> resourceList;
 
-
 }
