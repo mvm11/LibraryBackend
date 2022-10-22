@@ -1,14 +1,14 @@
 package com.iud.library.gateway;
 
-import com.iud.library.entity.Book;
+import com.iud.library.dto.BookDTO;
 
 import java.util.List;
 
 public interface BookGateway {
 
-    public List<Book> findAllBooks();
-    public Book findBookById(Integer bookId);
-    public Book createBook(Book book);
+    public List<BookDTO> findAllBooks();
+    public BookDTO findBookById(Integer bookId);
+    public BookDTO createBook(BookDTO bookDTO);
     public void deleteBook(Integer bookId);
-    public Book updateBook(Book book);
+    public BookDTO updateBook(BookDTO bookDTO, Integer bookId);
 }

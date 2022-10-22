@@ -1,5 +1,6 @@
 package com.iud.library.controller;
 
+import com.iud.library.dto.BookDTO;
 import com.iud.library.entity.Book;
 import com.iud.library.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,28 +19,28 @@ public class BookController {
 
     // Listar
     @GetMapping(value = "/getAllBooks")
-    public List<Book> FindAllBooks(){
+    public List<BookDTO> FindAllBooks(){
         return bookService.findAllBooks();
     }
     // listar por ID
     @GetMapping(value = "/getBookById/{id}")
-    public ResponseEntity<Book> findBookById(@PathVariable Integer id) {
-        return ResponseEntity.status(HttpStatus.OK).body(bookService.findBookById(id));
+    public ResponseEntity<BookDTO> findBookById(@PathVariable Integer id) {
+        return ResponseEntity.ok(bookService.findBookById(id));
     }
     // Crear, Guardar
     @PostMapping("/saveBook")
-    ResponseEntity<Book> saveBook(@RequestBody Book book){
-        return new ResponseEntity<>(bookService.createBook(book), HttpStatus.CREATED);
+    ResponseEntity<BookDTO> saveBook(@RequestBody BookDTO bookDTO){
+        return new ResponseEntity<>(bookService.createBook(bookDTO), HttpStatus.CREATED);
     }
     // Actualizar
     @PutMapping("/updateBook/{id}")
-    ResponseEntity<Book> updateBook(@RequestBody Book book, @PathVariable Integer id){
-        return new ResponseEntity<>(bookService.updateBook(book), HttpStatus.OK);
+    ResponseEntity<BookDTO> updateBook(@RequestBody BookDTO bookDTO, @PathVariable Integer id){
+        return new ResponseEntity<>(bookService.updateBook(bookDTO, id), HttpStatus.OK);
     }
     //Eliminar
     @DeleteMapping("/deleteBook/{id}")
     ResponseEntity deleteBook(@PathVariable Integer id){
         bookService.deleteBook(id);
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>("The book has been deleted successful",HttpStatus.NO_CONTENT);
     }
 }
