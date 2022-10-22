@@ -2,10 +2,15 @@ package com.iud.library.service;
 
 import com.iud.library.common.exception.NotFoundException;
 import com.iud.library.dto.BookDTO;
+import com.iud.library.dto.BookResponse;
 import com.iud.library.entity.Book;
 import com.iud.library.gateway.BookGateway;
 import com.iud.library.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,15 +24,29 @@ public class BookService implements BookGateway {
     private BookRepository bookRepository;
 
     @Override
-    public List<BookDTO> findAllBooks() {
+    public BookResponse findAllBooks(int pageNumber, int pageQuantityOfBooks, String sortBookBy) {
 
+        // Create Pageable
+        Pageable pageable = PageRequest.of(pageNumber, pageQuantityOfBooks, Sort.by(sortBookBy));
+
+        // Add pageable to the method findAll
+        Page<Book> bookPages = bookRepository.findAll(pageable);
         // Get all books from the repository
-        List<Book> bookList = bookRepository.findAll();
+        List<Book> bookList = bookPages.getContent();
 
-        // Convert all the repository books to DTO
-        return bookList.stream()
+        // Convert each book of the bookList to a DTO
+        List<BookDTO> bookContentList = bookList.stream()
                 .map(BookService::convertBookToDTO)
                 .collect(Collectors.toList());
+
+        return BookResponse.builder()
+                .bookContentList(bookContentList)
+                .pageNumber(bookPages.getNumber())
+                .pageQuantityOfBooks(bookPages.getSize())
+                .totalBooks(bookPages.getTotalElements())
+                .totalPages(bookPages.getTotalPages())
+                .isTheLastOnePage(bookPages.isLast())
+                .build();
     }
 
     @Override
