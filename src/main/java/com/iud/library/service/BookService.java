@@ -43,8 +43,9 @@ public class BookService implements BookGateway {
 
     @Override
     public Book updateBook(Book book) {
-        Book foundBook = findBookById(book.getId());
+        Book foundBook = bookRepository.findById(book.getId()).orElse(null);
         foundBook.setTitle(book.getTitle());
         return bookRepository.save(foundBook);
     }
+
 }
