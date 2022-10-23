@@ -7,6 +7,8 @@ import com.iud.library.entity.LibraryUser;
 import com.iud.library.entity.Role;
 import com.iud.library.repository.RoleRepository;
 import com.iud.library.repository.UserRepository;
+import com.iud.library.security.JWTAuthResponseDTO;
+import com.iud.library.security.JwtTokenProvider;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -38,12 +40,20 @@ public class AuthController {
     private PasswordEncoder passwordEncoder;
 
 
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+
+
     @PostMapping("/login")
-    public ResponseEntity<String> authenticateUser(@RequestBody LoginDTO loginDTO){
+    public ResponseEntity<JWTAuthResponseDTO> authenticateUser(@RequestBody LoginDTO loginDTO){
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDTO.getUsernameOrEmail(), loginDTO.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        return new ResponseEntity<>("Login successful", HttpStatus.OK);
+
+        //get token from jwtTokenProvider
+        String token = jwtTokenProvider.generateToken(authentication);
+
+        return ResponseEntity.ok(new JWTAuthResponseDTO(token));
     }
 
     // Register Admin

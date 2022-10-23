@@ -14,7 +14,6 @@ import java.util.List;
 @Table(name = "books", uniqueConstraints = { @UniqueConstraint(columnNames = { "title" }),
         @UniqueConstraint(columnNames = { "isbn" }) })
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Book {
