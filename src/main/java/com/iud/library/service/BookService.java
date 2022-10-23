@@ -95,6 +95,7 @@ public class BookService implements BookGateway {
         book.setPublisher(bookDTO.getPublisher());
         book.setFormat(bookDTO.getFormat());
         book.setCategory(bookDTO.getCategory());
+        book.setAuthors(bookDTO.getAuthors());
 
         Book bookUpdated = bookRepository.save(book);
 
