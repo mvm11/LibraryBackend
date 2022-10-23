@@ -1,6 +1,7 @@
 package com.iud.library.dto;
 
 import com.iud.library.entity.Author;
+import com.iud.library.entity.Category;
 import com.iud.library.entity.Copy;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,12 +38,12 @@ public class BookDTO {
 
     private String format;
 
-
-    private String category;
-
     private List<Copy> copies;
 
     @NotEmpty
     private Set<Author> authors;
+
+    @NotEmpty
+    private Set<Category> categories;
 
 }
