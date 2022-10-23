@@ -13,7 +13,7 @@ public class NotFoundException extends RuntimeException{
     private final long value;
 
     public NotFoundException(String resource, String name, long value) {
-        super(String.format("%s hasn't found with : %s : '%s'", resource, name, value));
+        super(String.format("%s hasn't found with %s : '%s'", resource, name, value));
         this.resource = resource;
         this.name = name;
         this.value = value;

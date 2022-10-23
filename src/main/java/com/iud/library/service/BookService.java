@@ -6,6 +6,7 @@ import com.iud.library.dto.BookResponse;
 import com.iud.library.entity.Book;
 import com.iud.library.gateway.BookGateway;
 import com.iud.library.repository.BookRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,6 +24,9 @@ public class BookService implements BookGateway {
     @Autowired
     private BookRepository bookRepository;
 
+    @Autowired
+    private ModelMapper modelMapper;
+
     @Override
     public BookResponse findAllBooks(int pageNumber, int pageQuantityOfBooks, String sortBookBy) {
 
@@ -36,7 +40,7 @@ public class BookService implements BookGateway {
 
         // Convert each book of the bookList to a DTO
         List<BookDTO> bookContentList = bookList.stream()
-                .map(BookService::convertBookToDTO)
+                .map(this::convertBookToDTO)
                 .collect(Collectors.toList());
 
         return BookResponse.builder()
@@ -70,29 +74,6 @@ public class BookService implements BookGateway {
         return convertBookToDTO(newBook);
     }
 
-    private static BookDTO convertBookToDTO(Book newBook) {
-        return BookDTO.builder()
-                .id(newBook.getId())
-                .title(newBook.getTitle())
-                .isbn(newBook.getIsbn())
-                .numberOfPages(newBook.getNumberOfPages())
-                .publisher(newBook.getPublisher())
-                .format(newBook.getFormat())
-                .category(newBook.getCategory())
-                .build();
-    }
-
-    private static Book convertDTOToBook(BookDTO bookDTO) {
-        return Book.builder()
-                .title(bookDTO.getTitle())
-                .isbn(bookDTO.getIsbn())
-                .numberOfPages(bookDTO.getNumberOfPages())
-                .publisher(bookDTO.getPublisher())
-                .format(bookDTO.getFormat())
-                .category(bookDTO.getCategory())
-                .build();
-    }
-
     @Override
     public void deleteBook(Integer bookId) {
         // Get book from the repository
@@ -124,6 +105,13 @@ public class BookService implements BookGateway {
         return bookRepository.findById(bookId)
                 // if the book doesn't exist throw NotFoundException
                 .orElseThrow(() -> new NotFoundException("Book", "id", bookId));
+    }
+
+    private BookDTO convertBookToDTO(Book book) {
+        return modelMapper.map(book, BookDTO.class);
+    }
+
+    private Book convertDTOToBook(BookDTO bookDTO) {return modelMapper.map(bookDTO, Book.class);
     }
 
 }

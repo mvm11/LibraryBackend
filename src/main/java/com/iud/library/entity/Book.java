@@ -1,13 +1,14 @@
 package com.iud.library.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "books", uniqueConstraints = {@UniqueConstraint(columnNames = {"title", "isbn"})})
@@ -39,8 +40,9 @@ public class Book {
     @Column(name="category", nullable = false)
     private String category;
 
+    @JsonBackReference
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Copy> copyList = new HashSet<>();
+    private List<Copy> copies = new ArrayList<>();
 
 
 }

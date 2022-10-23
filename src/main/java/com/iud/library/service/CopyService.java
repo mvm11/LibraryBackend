@@ -8,6 +8,7 @@ import com.iud.library.entity.Copy;
 import com.iud.library.gateway.CopyGateway;
 import com.iud.library.repository.BookRepository;
 import com.iud.library.repository.CopyRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,9 @@ public class CopyService implements CopyGateway {
 
     @Autowired
     private CopyRepository copyRepository;
+
+    @Autowired
+    private ModelMapper modelMapper;
 
     @Override
     public CopyDTO saveCopy(Integer bookId, CopyDTO copyDTO) {
@@ -89,17 +93,7 @@ public class CopyService implements CopyGateway {
         copyRepository.delete(copy);
     }
 
-    private CopyDTO convertCopyToDTO(Copy copy){
-        return CopyDTO.builder()
-                .id(copy.getId())
-                .editionNumber(copy.getEditionNumber())
-                .build();
-    }
+    private CopyDTO convertCopyToDTO(Copy copy){return modelMapper.map(copy, CopyDTO.class);}
 
-    private Copy convertDTOToCopy(CopyDTO copyDTO){
-        return Copy.builder()
-                .id(copyDTO.getId())
-                .editionNumber(copyDTO.getEditionNumber())
-                .build();
-    }
+    private Copy convertDTOToCopy(CopyDTO copyDTO){return modelMapper.map(copyDTO, Copy.class);}
 }
