@@ -11,6 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/books")
+@CrossOrigin(origins = "*")
 public class CopyController {
 
     @Autowired

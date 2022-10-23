@@ -7,12 +7,14 @@ import com.iud.library.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/book")
+@CrossOrigin(origins = "*")
 public class BookController {
 
     @Autowired
@@ -32,16 +34,19 @@ public class BookController {
         return ResponseEntity.ok(bookService.findBookById(id));
     }
     // Save
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/saveBook")
     ResponseEntity<BookDTO> saveBook(@Valid @RequestBody BookDTO bookDTO){
         return new ResponseEntity<>(bookService.createBook(bookDTO), HttpStatus.CREATED);
     }
     // Update
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/updateBook/{id}")
     ResponseEntity<BookDTO> updateBook(@Valid @RequestBody BookDTO bookDTO, @PathVariable Integer id){
         return new ResponseEntity<>(bookService.updateBook(bookDTO, id), HttpStatus.OK);
     }
     //Delete
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/deleteBook/{id}")
     ResponseEntity deleteBook(@PathVariable Integer id){
         bookService.deleteBook(id);

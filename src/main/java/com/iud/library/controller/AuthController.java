@@ -1,0 +1,148 @@
+package com.iud.library.controller;
+
+import com.iud.library.common.constants.AppConstants;
+import com.iud.library.dto.LoginDTO;
+import com.iud.library.dto.RegisterDTO;
+import com.iud.library.entity.LibraryUser;
+import com.iud.library.entity.Role;
+import com.iud.library.repository.RoleRepository;
+import com.iud.library.repository.UserRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Collections;
+
+@RestController
+@RequestMapping("/auth")
+@CrossOrigin(origins = "*")
+public class AuthController {
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private RoleRepository roleRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+
+    @PostMapping("/login")
+    public ResponseEntity<String> authenticateUser(@RequestBody LoginDTO loginDTO){
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDTO.getUsernameOrEmail(), loginDTO.getPassword()));
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        return new ResponseEntity<>("Login successful", HttpStatus.OK);
+    }
+
+    // Register Admin
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/registerAdmin")
+    public ResponseEntity<?> registerAdmin(@RequestBody RegisterDTO registerDTO){
+
+        if(userRepository.existsByUsername(registerDTO.getUsername())) {
+            return new ResponseEntity<>("That username already exists ",HttpStatus.BAD_REQUEST);
+        }
+
+        if(userRepository.existsByEmail(registerDTO.getEmail())) {
+            return new ResponseEntity<>("That email already exists ",HttpStatus.BAD_REQUEST);
+        }
+
+        LibraryUser libraryUser = LibraryUser.builder()
+                .name(registerDTO.getName())
+                .lastName(registerDTO.getLastName())
+                .address(registerDTO.getAddress())
+                .dni(registerDTO.getDni())
+                .cellphone(registerDTO.getCellphone())
+                .canBorrowBooks(registerDTO.getCanBorrowBooks())
+                .username(registerDTO.getUsername())
+                .email(registerDTO.getEmail())
+                .password(passwordEncoder.encode(registerDTO.getPassword()))
+                .build();
+
+        Role roles = roleRepository.findByName(AppConstants.ROLE_ADMIN).get();
+        libraryUser.setRoles(Collections.singleton(roles));
+
+        userRepository.save(libraryUser);
+        return new ResponseEntity<>("The admin has been register successful",HttpStatus.OK);
+    }
+
+    // Register Teacher
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/registerTeacher")
+    public ResponseEntity<?> registerTeacher(@RequestBody RegisterDTO registerDTO){
+
+        if(userRepository.existsByUsername(registerDTO.getUsername())) {
+            return new ResponseEntity<>("That username already exists ",HttpStatus.BAD_REQUEST);
+        }
+
+        if(userRepository.existsByEmail(registerDTO.getEmail())) {
+            return new ResponseEntity<>("That email already exists ",HttpStatus.BAD_REQUEST);
+        }
+
+        LibraryUser libraryUser = LibraryUser.builder()
+                .name(registerDTO.getName())
+                .lastName(registerDTO.getLastName())
+                .address(registerDTO.getAddress())
+                .dni(registerDTO.getDni())
+                .cellphone(registerDTO.getCellphone())
+                .canBorrowBooks(registerDTO.getCanBorrowBooks())
+                .username(registerDTO.getUsername())
+                .email(registerDTO.getEmail())
+                .password(passwordEncoder.encode(registerDTO.getPassword()))
+                .build();
+
+        Role roles = roleRepository.findByName(AppConstants.ROLE_TEACHER).get();
+        libraryUser.setRoles(Collections.singleton(roles));
+
+        userRepository.save(libraryUser);
+        return new ResponseEntity<>("The teacher has been register successful",HttpStatus.OK);
+    }
+
+    // Register Student
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/registerStudent")
+    public ResponseEntity<?> registerUser(@RequestBody RegisterDTO registerDTO){
+        if(userRepository.existsByUsername(registerDTO.getUsername())) {
+            return new ResponseEntity<>("That username already exists ",HttpStatus.BAD_REQUEST);
+        }
+
+        if(userRepository.existsByEmail(registerDTO.getEmail())) {
+            return new ResponseEntity<>("That email already exists ",HttpStatus.BAD_REQUEST);
+        }
+
+        LibraryUser libraryUser = LibraryUser.builder()
+                .name(registerDTO.getName())
+                .lastName(registerDTO.getLastName())
+                .address(registerDTO.getAddress())
+                .dni(registerDTO.getDni())
+                .cellphone(registerDTO.getCellphone())
+                .canBorrowBooks(registerDTO.getCanBorrowBooks())
+                .username(registerDTO.getUsername())
+                .email(registerDTO.getEmail())
+                .password(passwordEncoder.encode(registerDTO.getPassword()))
+                .build();
+
+        Role roles = roleRepository.findByName(AppConstants.ROLE_STUDENT).get();
+        libraryUser.setRoles(Collections.singleton(roles));
+
+        userRepository.save(libraryUser);
+        return new ResponseEntity<>("The student has been register successful",HttpStatus.OK);
+    }
+
+
+}
