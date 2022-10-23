@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("/book")
 public class BookController {
@@ -31,12 +33,12 @@ public class BookController {
     }
     // Save
     @PostMapping("/saveBook")
-    ResponseEntity<BookDTO> saveBook(@RequestBody BookDTO bookDTO){
+    ResponseEntity<BookDTO> saveBook(@Valid @RequestBody BookDTO bookDTO){
         return new ResponseEntity<>(bookService.createBook(bookDTO), HttpStatus.CREATED);
     }
     // Update
     @PutMapping("/updateBook/{id}")
-    ResponseEntity<BookDTO> updateBook(@RequestBody BookDTO bookDTO, @PathVariable Integer id){
+    ResponseEntity<BookDTO> updateBook(@Valid @RequestBody BookDTO bookDTO, @PathVariable Integer id){
         return new ResponseEntity<>(bookService.updateBook(bookDTO, id), HttpStatus.OK);
     }
     //Delete
