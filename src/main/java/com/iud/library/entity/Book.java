@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "books", uniqueConstraints = {@UniqueConstraint(columnNames = {"title", "isbn"})})
@@ -36,6 +38,9 @@ public class Book {
 
     @Column(name="category", nullable = false)
     private String category;
+
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Copy> copyList = new HashSet<>();
 
 
 }
