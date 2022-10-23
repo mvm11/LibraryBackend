@@ -6,9 +6,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
-@Table(name = "book")
+@Table(name = "books", uniqueConstraints = {@UniqueConstraint(columnNames = {"title", "isbn"})})
 @Data
 @Builder
 @NoArgsConstructor
@@ -19,6 +21,26 @@ public class Book {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Integer id;
 
-    @Column(name="title")
+    @Column(name="title", nullable = false)
     private String title;
+
+    @Column(name="isbn", nullable = false)
+    private String isbn;
+
+    @Column(name="numberOfPages", nullable = false)
+    private Integer numberOfPages;
+
+    @Column(name="publisher", nullable = false)
+    private String publisher;
+
+    @Column(name="format", nullable = false)
+    private String format;
+
+    @Column(name="category", nullable = false)
+    private String category;
+
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Copy> copyList = new HashSet<>();
+
+
 }
