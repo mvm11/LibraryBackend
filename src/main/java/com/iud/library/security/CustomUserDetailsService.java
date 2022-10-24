@@ -1,7 +1,7 @@
 package com.iud.library.security;
 
-import com.iud.library.entity.Role;
 import com.iud.library.entity.LibraryUser;
+import com.iud.library.entity.Role;
 import com.iud.library.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -13,7 +13,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 

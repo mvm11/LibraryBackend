@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -62,6 +63,27 @@ public class BookService implements BookGateway {
     }
 
     @Override
+    public List<BookDTO> findBookByPublisher(String publisher) {
+        List<Book> bookList = bookRepository.findAll();
+
+        List<Book> bookListFilteredByPublisher = filterBookByPublisher(publisher, bookList);
+
+        if(bookListFilteredByPublisher.isEmpty()){
+            throw new NotFoundException("Book", "publisher", publisher);
+        }else{
+            return bookListFilteredByPublisher.stream()
+                    .map(this::convertBookToDTO)
+                    .collect(Collectors.toList());
+        }
+    }
+
+    private static List<Book> filterBookByPublisher(String publisher, List<Book> bookList) {
+        return bookList.stream()
+                .filter(book -> book.getPublisher().equals(publisher))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public BookDTO createBook(BookDTO bookDTO) {
 
         // Parse from DTO to Entity
@@ -94,7 +116,8 @@ public class BookService implements BookGateway {
         book.setNumberOfPages(bookDTO.getNumberOfPages());
         book.setPublisher(bookDTO.getPublisher());
         book.setFormat(bookDTO.getFormat());
-        book.setCategory(bookDTO.getCategory());
+        book.setCategories(bookDTO.getCategories());
+        book.setAuthors(bookDTO.getAuthors());
 
         Book bookUpdated = bookRepository.save(book);
 
