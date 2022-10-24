@@ -5,6 +5,7 @@ import com.iud.library.service.CopyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,7 +34,7 @@ public class CopyController {
         return new ResponseEntity<>(copyDTO, HttpStatus.OK);
 
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/{bookId}/copies/saveCopy")
     public ResponseEntity<CopyDTO> saveCopy
             (@PathVariable(value = "bookId") Integer bookId, @RequestBody CopyDTO copyDTO){
@@ -41,7 +42,7 @@ public class CopyController {
         return new ResponseEntity<>(copyService.saveCopy(bookId, copyDTO), HttpStatus.CREATED);
 
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{bookId}/copies/{copyId}/updateCopy")
     public ResponseEntity<CopyDTO> updateCopy(
             @PathVariable(value = "bookId") Integer bookId,
@@ -51,7 +52,7 @@ public class CopyController {
         return new ResponseEntity<>(copyDTOUpdated, HttpStatus.OK);
 
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{bookId}/copies/{copyId}/deleteCopy")
     public ResponseEntity<String> deleteCopy(
             @PathVariable(value = "bookId") Integer bookId,

@@ -11,6 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/book")
@@ -32,6 +33,12 @@ public class BookController {
     @GetMapping(value = "/getBookById/{id}")
     public ResponseEntity<BookDTO> findBookById(@PathVariable Integer id) {
         return ResponseEntity.ok(bookService.findBookById(id));
+    }
+
+    // Find by publisher
+    @GetMapping(value = "/getBookByPublisher/{publisher}")
+    public ResponseEntity<List<BookDTO>> findBookByPublisher(@PathVariable String publisher) {
+        return ResponseEntity.ok(bookService.findBookByPublisher(publisher));
     }
     // Save
     @PreAuthorize("hasRole('ADMIN')")
