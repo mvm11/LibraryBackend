@@ -4,6 +4,7 @@ import com.iud.library.common.exception.NotFoundException;
 import com.iud.library.dto.BookDTO;
 import com.iud.library.dto.BookResponse;
 import com.iud.library.entity.Book;
+import com.iud.library.entity.Category;
 import com.iud.library.gateway.BookGateway;
 import com.iud.library.repository.BookRepository;
 import org.modelmapper.ModelMapper;
@@ -14,8 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -68,10 +68,24 @@ public class BookService implements BookGateway {
 
         List<Book> bookListFilteredByPublisher = filterBookByPublisher(publisher, bookList);
 
-        if(bookListFilteredByPublisher.isEmpty()){
-            throw new NotFoundException("Book", "publisher", publisher);
+        return validateFilteredBook(bookListFilteredByPublisher, "publisher", publisher);
+    }
+
+    @Override
+    public List<BookDTO> findBookByCategory(String category) {
+
+        List<Book> bookList = bookRepository.findAll();
+
+        List<Book> bookListFilteredByCategory = filterBookByCategory(category, bookList);
+
+        return validateFilteredBook(bookListFilteredByCategory, "category", category);
+    }
+
+    private List<BookDTO> validateFilteredBook(List<Book> bookListFilteredByCategory, String parameter, String category) {
+        if(bookListFilteredByCategory.isEmpty()){
+            throw new NotFoundException("Book", parameter, category);
         }else{
-            return bookListFilteredByPublisher.stream()
+            return bookListFilteredByCategory.stream()
                     .map(this::convertBookToDTO)
                     .collect(Collectors.toList());
         }
@@ -81,6 +95,32 @@ public class BookService implements BookGateway {
         return bookList.stream()
                 .filter(book -> book.getPublisher().equals(publisher))
                 .collect(Collectors.toList());
+    }
+
+    private static List<Book> filterBookByCategory(String category, List<Book> bookList) {
+
+
+        Set<Category> bookCategories = getBookCategories(category, bookList);
+
+        return validateBookCategories(category, bookList, bookCategories);
+    }
+
+    private static List<Book> validateBookCategories(String category, List<Book> bookList, Set<Category> bookCategories) {
+        if(bookCategories.isEmpty()){
+            throw new NotFoundException("Book", "category", category);
+        }else{
+            return bookList.stream()
+                    .filter(book -> book.getCategories().containsAll(bookCategories))
+                    .collect(Collectors.toList());
+        }
+    }
+
+    private static Set<Category> getBookCategories(String category, List<Book> bookList) {
+        return bookList.stream()
+                .map(Book::getCategories)
+                .flatMap(Collection::stream)
+                .filter(category1 -> category1.getName().equals(category))
+                .collect(Collectors.toSet());
     }
 
     @Override
