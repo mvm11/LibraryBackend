@@ -81,23 +81,39 @@ public class BookService implements BookGateway {
         return validateFilteredBook(bookListFilteredByCategory, "category", category);
     }
 
-    private List<BookDTO> validateFilteredBook(List<Book> bookListFilteredByCategory, String parameter, String category) {
-        if(bookListFilteredByCategory.isEmpty()){
-            throw new NotFoundException("Book", parameter, category);
+    @Override
+    public List<BookDTO> findBookByFormat(String format) {
+
+        List<Book> bookList = bookRepository.findAll();
+
+        List<Book> bookListFilteredByFormat = filterBookByFormat(format, bookList);
+
+        return validateFilteredBook(bookListFilteredByFormat, "format", format);
+    }
+
+    private List<Book> filterBookByFormat(String format, List<Book> bookList) {
+        return bookList.stream()
+                .filter(book -> book.getFormat().equalsIgnoreCase(format))
+                .collect(Collectors.toList());
+    }
+
+    private List<BookDTO> validateFilteredBook(List<Book> bookListFilteredByQuery, String queryName, String query) {
+        if(bookListFilteredByQuery.isEmpty()){
+            throw new NotFoundException("Book", queryName, query);
         }else{
-            return bookListFilteredByCategory.stream()
+            return bookListFilteredByQuery.stream()
                     .map(this::convertBookToDTO)
                     .collect(Collectors.toList());
         }
     }
 
-    private static List<Book> filterBookByPublisher(String publisher, List<Book> bookList) {
+    private List<Book> filterBookByPublisher(String publisher, List<Book> bookList) {
         return bookList.stream()
-                .filter(book -> book.getPublisher().equals(publisher))
+                .filter(book -> book.getPublisher().equalsIgnoreCase(publisher))
                 .collect(Collectors.toList());
     }
 
-    private static List<Book> filterBookByCategory(String category, List<Book> bookList) {
+    private List<Book> filterBookByCategory(String category, List<Book> bookList) {
 
 
         Set<Category> bookCategories = getBookCategories(category, bookList);
@@ -105,7 +121,7 @@ public class BookService implements BookGateway {
         return validateBookCategories(category, bookList, bookCategories);
     }
 
-    private static List<Book> validateBookCategories(String category, List<Book> bookList, Set<Category> bookCategories) {
+    private List<Book> validateBookCategories(String category, List<Book> bookList, Set<Category> bookCategories) {
         if(bookCategories.isEmpty()){
             throw new NotFoundException("Book", "category", category);
         }else{
@@ -115,11 +131,11 @@ public class BookService implements BookGateway {
         }
     }
 
-    private static Set<Category> getBookCategories(String category, List<Book> bookList) {
+    private Set<Category> getBookCategories(String category, List<Book> bookList) {
         return bookList.stream()
                 .map(Book::getCategories)
                 .flatMap(Collection::stream)
-                .filter(category1 -> category1.getName().equals(category))
+                .filter(category1 -> category1.getName().equalsIgnoreCase(category))
                 .collect(Collectors.toSet());
     }
 
