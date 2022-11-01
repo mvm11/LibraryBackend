@@ -22,6 +22,14 @@ public class Copy {
     @Column(name="editionNumber", nullable = false)
     private String editionNumber;
 
+    @Column(name="state", nullable = false)
+    private String state;
+
+    @OneToOne(mappedBy = "copy")
+    private Loan loan;
+
+    private boolean isLend;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id", nullable = false)
     private Book book;
