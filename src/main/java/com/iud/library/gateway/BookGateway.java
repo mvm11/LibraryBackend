@@ -12,6 +12,7 @@ public interface BookGateway {
     BookDTO findBookById(Integer bookId);
     List<BookDTO> findBookByPublisher(String publisher);
     List<BookDTO> findBookByCategory(String category);
+    List<BookDTO> findBookByFormat(String format);
     BookDTO createBook(BookDTO bookDTO);
     void deleteBook(Integer bookId);
     BookDTO updateBook(BookDTO bookDTO, Integer bookId);
