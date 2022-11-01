@@ -52,6 +52,12 @@ public class BookController {
     public ResponseEntity<List<BookDTO>> findBookByFormat(@PathVariable String format) {
         return ResponseEntity.ok(bookService.findBookByFormat(format));
     }
+
+    // Find by author
+    @GetMapping(value = "/getBookByAuthor/{author}")
+    public ResponseEntity<List<BookDTO>> findBookByAuthor(@PathVariable String author) {
+        return ResponseEntity.ok(bookService.findBookByAuthor(author));
+    }
     // Save
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/saveBook")

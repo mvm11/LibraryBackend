@@ -3,6 +3,7 @@ package com.iud.library.service;
 import com.iud.library.common.exception.NotFoundException;
 import com.iud.library.dto.BookDTO;
 import com.iud.library.dto.BookResponse;
+import com.iud.library.entity.Author;
 import com.iud.library.entity.Book;
 import com.iud.library.entity.Category;
 import com.iud.library.gateway.BookGateway;
@@ -89,6 +90,42 @@ public class BookService implements BookGateway {
         List<Book> bookListFilteredByFormat = filterBookByFormat(format, bookList);
 
         return validateFilteredBook(bookListFilteredByFormat, "format", format);
+    }
+
+    @Override
+    public List<BookDTO> findBookByAuthor(String author) {
+
+        List<Book> bookList = bookRepository.findAll();
+
+        List<Book> bookListFilteredByAuthor = filterBookByAuthor(author, bookList);
+
+        return validateFilteredBook(bookListFilteredByAuthor, "author", author);
+    }
+
+    private List<Book> filterBookByAuthor(String author, List<Book> bookList) {
+
+        Set<Author> bookAuthors = getBookAuthor(author, bookList);
+
+        return validateBookAuthor(author, bookList, bookAuthors);
+    }
+
+    private List<Book> validateBookAuthor(String author, List<Book> bookList, Set<Author> bookAuthors) {
+
+        if(bookAuthors.isEmpty()){
+            throw new NotFoundException("Book", "author", author);
+        }else{
+            return bookList.stream()
+                    .filter(book -> book.getAuthors().containsAll(bookAuthors))
+                    .collect(Collectors.toList());
+        }
+    }
+
+    private Set<Author> getBookAuthor(String author, List<Book> bookList) {
+        return bookList.stream()
+                .map(Book::getAuthors)
+                .flatMap(Collection::stream)
+                .filter(author1 -> author1.getName().equalsIgnoreCase(author))
+                .collect(Collectors.toSet());
     }
 
     private List<Book> filterBookByFormat(String format, List<Book> bookList) {
