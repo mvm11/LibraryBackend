@@ -14,14 +14,22 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.annotation.SchedulingConfigurer;
+import org.springframework.scheduling.config.CronTask;
+import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.stereotype.Service;
 
+import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class BookService implements BookGateway {
 
+
+    @Autowired
+    private TaskScheduler taskScheduler;
 
     @Autowired
     private BookRepository bookRepository;
@@ -185,8 +193,19 @@ public class BookService implements BookGateway {
         // Save into the repository
         Book newBook = bookRepository.save(book);
 
+        //Load the cron expression from database
+        taskScheduler.schedule(
+                this::startJob,
+                new Date(OffsetDateTime.now().plusSeconds(10).toInstant().toEpochMilli())
+        );
+
+
         // Parse from Entity to DTO
         return convertBookToDTO(newBook);
+    }
+
+    public void startJob() {
+        System.out.println("me imprimí "+ new Date());
     }
 
     @Override
@@ -229,5 +248,6 @@ public class BookService implements BookGateway {
 
     private Book convertDTOToBook(BookDTO bookDTO) {return modelMapper.map(bookDTO, Book.class);
     }
+
 
 }
