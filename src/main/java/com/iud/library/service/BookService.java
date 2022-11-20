@@ -2,7 +2,6 @@ package com.iud.library.service;
 
 import com.iud.library.common.exception.NotFoundException;
 import com.iud.library.dto.BookDTO;
-import com.iud.library.dto.BookResponse;
 import com.iud.library.entity.Author;
 import com.iud.library.entity.Book;
 import com.iud.library.entity.Category;
@@ -13,10 +12,6 @@ import com.iud.library.repository.PublisherRepository;
 import com.iud.library.request.BookRequest;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 
@@ -218,19 +213,22 @@ public class BookService implements BookGateway {
     }
 
     @Override
-    public BookDTO updateBook(BookDTO bookDTO, Integer bookId) {
+    public BookDTO updateBook(Integer bookId, BookRequest bookRequest) {
+
+        Publisher publisher = new Publisher();
+        publisher.setPublisherName(bookRequest.getPublisherName());
         // Get book from the repository
         Book book = getBook(bookId);
 
         // Set the DTO values into the found book
-        book.setTitle(bookDTO.getTitle());
-        book.setTitle(bookDTO.getTitle());
-        book.setIsbn(bookDTO.getIsbn());
-        book.setNumberOfPages(bookDTO.getNumberOfPages());
-        //book.setPublisher(bookDTO.getPublisher());
-        book.setFormat(bookDTO.getFormat());
-        book.setCategories(bookDTO.getCategories());
-        book.setAuthors(bookDTO.getAuthors());
+        book.setTitle(bookRequest.getTitle());
+        book.setTitle(bookRequest.getTitle());
+        book.setIsbn(bookRequest.getIsbn());
+        book.setNumberOfPages(bookRequest.getNumberOfPages());
+        book.setPublisher(publisher);
+        book.setFormat(bookRequest.getFormat());
+        book.setCategories(bookRequest.getCategories());
+        book.setAuthors(bookRequest.getAuthors());
 
         Book bookUpdated = bookRepository.save(book);
 

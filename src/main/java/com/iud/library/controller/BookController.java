@@ -1,8 +1,6 @@
 package com.iud.library.controller;
 
-import com.iud.library.common.constants.AppConstants;
 import com.iud.library.dto.BookDTO;
-import com.iud.library.dto.BookResponse;
 import com.iud.library.request.BookRequest;
 import com.iud.library.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,8 +63,8 @@ public class BookController {
     // Update
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/updateBook/{id}")
-    ResponseEntity<BookDTO> updateBook(@Valid @RequestBody BookDTO bookDTO, @PathVariable Integer id){
-        return new ResponseEntity<>(bookService.updateBook(bookDTO, id), HttpStatus.OK);
+    ResponseEntity<BookDTO> updateBook(@Valid @RequestBody BookRequest bookRequest, @PathVariable Integer id){
+        return new ResponseEntity<>(bookService.updateBook(id, bookRequest), HttpStatus.OK);
     }
     //Delete
     @PreAuthorize("hasRole('ADMIN')")

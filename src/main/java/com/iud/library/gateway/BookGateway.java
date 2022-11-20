@@ -15,5 +15,5 @@ public interface BookGateway {
     List<BookDTO> findBookByAuthor(String author);
     BookDTO createBook(BookRequest bookRequest);
     void deleteBook(Integer bookId);
-    BookDTO updateBook(BookDTO bookDTO, Integer bookId);
+    BookDTO updateBook(Integer bookId, BookRequest bookRequest);
 }
