@@ -41,29 +41,12 @@ public class BookService implements BookGateway {
     private ModelMapper modelMapper;
 
     @Override
-    public BookResponse findAllBooks(int pageNumber, int pageQuantityOfBooks, String sortBookBy) {
+    public List<BookDTO> findAllBooks(){
 
-        // Create Pageable
-        Pageable pageable = PageRequest.of(pageNumber, pageQuantityOfBooks, Sort.by(sortBookBy));
-
-        // Add pageable to the method findAll
-        Page<Book> bookPages = bookRepository.findAll(pageable);
-        // Get all books from the repository
-        List<Book> bookList = bookPages.getContent();
-
-        // Convert each book of the bookList to a DTO
-        List<BookDTO> bookContentList = bookList.stream()
+        return bookRepository.findAll()
+                .stream()
                 .map(this::convertBookToDTO)
                 .collect(Collectors.toList());
-
-        return BookResponse.builder()
-                .bookContentList(bookContentList)
-                .pageNumber(bookPages.getNumber())
-                .pageQuantityOfBooks(bookPages.getSize())
-                .totalBooks(bookPages.getTotalElements())
-                .totalPages(bookPages.getTotalPages())
-                .isTheLastOnePage(bookPages.isLast())
-                .build();
     }
 
     @Override

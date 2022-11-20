@@ -24,11 +24,8 @@ public class BookController {
 
     // Find All
     @GetMapping(value = "/getAllBooks")
-    public BookResponse FindAllBooks(
-            @RequestParam(value = "pageNumber", defaultValue = AppConstants.DEFAULT_NUMBER_PAGE, required = false) int pageNumber,
-            @RequestParam(value = "pageSize", defaultValue = AppConstants.DEFAULT_PAGE_QUANTITY_BOOKS, required = false) int pageQuantityOfBooks,
-            @RequestParam(value = "sortBy", defaultValue = AppConstants.DEFAULT_SORT_BOOK_BY, required = false) String sortBookBy){
-        return bookService.findAllBooks(pageNumber, pageQuantityOfBooks, sortBookBy);
+    public List<BookDTO>  findAllBooks(){
+        return bookService.findAllBooks();
     }
     // Find by id
     @GetMapping(value = "/getBookById/{id}")

@@ -2,10 +2,7 @@ package com.iud.library.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.iud.library.request.BookRequest;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -38,7 +35,7 @@ public class Book {
     @Column(name="format", nullable = false)
     private String format;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "publisher_id")
     private Publisher publisher;
 

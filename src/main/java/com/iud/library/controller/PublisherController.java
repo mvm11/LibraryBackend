@@ -18,7 +18,6 @@ public class PublisherController {
 
     @Autowired
     private PublisherService publisherService;
-
     @GetMapping("/findAllPublishers")
     public List<PublisherDTO> findAllPublishers(){
 
@@ -34,11 +33,27 @@ public class PublisherController {
         return new ResponseEntity<>(publisherDTO, HttpStatus.OK);
 
     }
+
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/savePublisher")
-    public ResponseEntity<PublisherDTO> savePublisher(@RequestBody PublisherDTO publisherDTO){
+    @PostMapping("/{bookId}/publishers/savePublisher")
+    public ResponseEntity<PublisherDTO> saveCopy
+            (@PathVariable(value = "bookId") Integer bookId, @RequestBody PublisherDTO publisherDTO){
 
-        return new ResponseEntity<>(publisherService.savePublisher(publisherDTO), HttpStatus.CREATED);
+        return new ResponseEntity<>(publisherService.savePublisher(bookId, publisherDTO), HttpStatus.CREATED);
 
+    }
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/updatePublisher/{publisherId}")
+    public ResponseEntity<PublisherDTO> updatePublisher(@PathVariable Integer publisherId, @RequestBody PublisherDTO publisherDTO){
+
+        return new ResponseEntity<>(publisherService.updatePublisher(publisherId, publisherDTO), HttpStatus.CREATED);
+    }
+
+    //Delete
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{bookId}/publishers/{publisherId}/deletePublisher")
+    ResponseEntity<String> deletePublisher(@PathVariable Integer bookId, @PathVariable Integer publisherId){
+        publisherService.deletePublisher(bookId, publisherId);
+        return new ResponseEntity<>("The publisher has been deleted successful",HttpStatus.NO_CONTENT);
     }
 }
