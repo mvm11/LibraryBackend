@@ -1,7 +1,9 @@
 package com.iud.library.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.iud.library.request.BookRequest;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
+@Builder
 @Table(name = "books", uniqueConstraints = { @UniqueConstraint(columnNames = { "title" }),
         @UniqueConstraint(columnNames = { "isbn" }) })
 @Data
@@ -32,11 +35,12 @@ public class Book {
     @Column(name="numberOfPages", nullable = false)
     private Integer numberOfPages;
 
-    @Column(name="publisher", nullable = false)
-    private String publisher;
-
     @Column(name="format", nullable = false)
     private String format;
+
+    @OneToOne
+    @JoinColumn(name = "publisher_id")
+    private Publisher publisher;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "book_categories", joinColumns = @JoinColumn(name = "book_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "category_id", referencedColumnName = "id"))
@@ -50,5 +54,10 @@ public class Book {
     @JoinTable(name = "book_authors", joinColumns = @JoinColumn(name = "book_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "author_id", referencedColumnName = "id"))
     private Set<Author> authors = new HashSet<>();
 
-
+    public Book(BookRequest bookRequest) {
+        this.title = bookRequest.getTitle();
+        this.isbn = bookRequest.getIsbn();
+        this.numberOfPages = bookRequest.getNumberOfPages();
+        this.format = bookRequest.getFormat();
+    }
 }

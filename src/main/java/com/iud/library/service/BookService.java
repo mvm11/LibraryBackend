@@ -6,8 +6,11 @@ import com.iud.library.dto.BookResponse;
 import com.iud.library.entity.Author;
 import com.iud.library.entity.Book;
 import com.iud.library.entity.Category;
+import com.iud.library.entity.Publisher;
 import com.iud.library.gateway.BookGateway;
 import com.iud.library.repository.BookRepository;
+import com.iud.library.repository.PublisherRepository;
+import com.iud.library.request.BookRequest;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -15,9 +18,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.TaskScheduler;
-import org.springframework.scheduling.annotation.SchedulingConfigurer;
-import org.springframework.scheduling.config.CronTask;
-import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
@@ -33,6 +33,9 @@ public class BookService implements BookGateway {
 
     @Autowired
     private BookRepository bookRepository;
+
+    @Autowired
+    private PublisherRepository publisherRepository;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -154,7 +157,7 @@ public class BookService implements BookGateway {
 
     private List<Book> filterBookByPublisher(String publisher, List<Book> bookList) {
         return bookList.stream()
-                .filter(book -> book.getPublisher().equalsIgnoreCase(publisher))
+                .filter(book -> book.getPublisher().getPublisherName().equalsIgnoreCase(publisher))
                 .collect(Collectors.toList());
     }
 
@@ -185,12 +188,28 @@ public class BookService implements BookGateway {
     }
 
     @Override
-    public BookDTO createBook(BookDTO bookDTO) {
+    public BookDTO createBook(BookRequest bookRequest) {
 
-        // Parse from DTO to Entity
-        Book book = convertDTOToBook(bookDTO);
+        Publisher publisher = Publisher.builder()
+                .publisherName(bookRequest.getPublisherName())
+                .build();
 
-        // Save into the repository
+
+        Book book = Book.builder()
+                .title(bookRequest.getTitle())
+                .isbn(bookRequest.getIsbn())
+                .numberOfPages(bookRequest.getNumberOfPages())
+                .format(bookRequest.getFormat())
+                .publisher(publisher)
+                .categories(bookRequest.getCategories())
+                .copies(bookRequest.getCopies())
+                .authors(bookRequest.getAuthors())
+                .build();
+
+        // Save publisher into the repository
+        publisherRepository.save(publisher);
+
+        // Save Book into the repository
         Book newBook = bookRepository.save(book);
 
         //Load the cron expression from database
@@ -198,7 +217,6 @@ public class BookService implements BookGateway {
                 this::startJob,
                 new Date(OffsetDateTime.now().plusSeconds(10).toInstant().toEpochMilli())
         );
-
 
         // Parse from Entity to DTO
         return convertBookToDTO(newBook);
@@ -226,7 +244,7 @@ public class BookService implements BookGateway {
         book.setTitle(bookDTO.getTitle());
         book.setIsbn(bookDTO.getIsbn());
         book.setNumberOfPages(bookDTO.getNumberOfPages());
-        book.setPublisher(bookDTO.getPublisher());
+        //book.setPublisher(bookDTO.getPublisher());
         book.setFormat(bookDTO.getFormat());
         book.setCategories(bookDTO.getCategories());
         book.setAuthors(bookDTO.getAuthors());

@@ -127,11 +127,11 @@ public class AuthController {
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/registerStudent")
     public ResponseEntity<?> registerUser(@RequestBody RegisterDTO registerDTO){
-        if(userRepository.existsByUsername(registerDTO.getUsername())) {
+        if(Boolean.TRUE.equals(userRepository.existsByUsername(registerDTO.getUsername()))) {
             return new ResponseEntity<>("That username already exists ",HttpStatus.BAD_REQUEST);
         }
 
-        if(userRepository.existsByEmail(registerDTO.getEmail())) {
+        if(Boolean.TRUE.equals(userRepository.existsByEmail(registerDTO.getEmail()))) {
             return new ResponseEntity<>("That email already exists ",HttpStatus.BAD_REQUEST);
         }
 

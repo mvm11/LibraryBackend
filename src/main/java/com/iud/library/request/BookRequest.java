@@ -1,9 +1,9 @@
-package com.iud.library.dto;
+package com.iud.library.request;
+
 
 import com.iud.library.entity.Author;
 import com.iud.library.entity.Category;
 import com.iud.library.entity.Copy;
-import com.iud.library.entity.Publisher;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,29 +14,25 @@ import javax.validation.constraints.Size;
 import java.util.List;
 import java.util.Set;
 
-@Data
 @Builder
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class BookDTO {
-
-    private Integer id;
+public class BookRequest {
 
     @NotEmpty
-    @Size(min = 2, message = "The book's title should have at least two characters")
     private String title;
 
     @NotEmpty
-    @Size(min = 2, message = "The book's isbn should have at least two characters")
     private String isbn;
 
 
     private Integer numberOfPages;
 
+    @NotEmpty
+    private String publisherName;
 
-    private Publisher publisher;
-
-
+    @NotEmpty
     private String format;
 
     private List<Copy> copies;
@@ -46,5 +42,4 @@ public class BookDTO {
 
     @NotEmpty
     private Set<Category> categories;
-
 }

@@ -3,6 +3,7 @@ package com.iud.library.controller;
 import com.iud.library.common.constants.AppConstants;
 import com.iud.library.dto.BookDTO;
 import com.iud.library.dto.BookResponse;
+import com.iud.library.request.BookRequest;
 import com.iud.library.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -61,8 +62,8 @@ public class BookController {
     // Save
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/saveBook")
-    ResponseEntity<BookDTO> saveBook(@Valid @RequestBody BookDTO bookDTO){
-        return new ResponseEntity<>(bookService.createBook(bookDTO), HttpStatus.CREATED);
+    ResponseEntity<BookDTO> saveBook(@Valid @RequestBody BookRequest bookRequest){
+        return new ResponseEntity<>(bookService.createBook(bookRequest), HttpStatus.CREATED);
     }
     // Update
     @PreAuthorize("hasRole('ADMIN')")
