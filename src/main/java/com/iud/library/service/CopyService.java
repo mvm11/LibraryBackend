@@ -60,7 +60,7 @@ public class CopyService implements CopyGateway {
         return convertCopyToDTO(copy);
     }
 
-    private static void validateBookAndCopyId(Book book, Copy copy) {
+    private void validateBookAndCopyId(Book book, Copy copy) {
         if(!copy.getBook().getId().equals(book.getId())){
             throw new LibraryException(HttpStatus.BAD_REQUEST, "the copy does not belong to the book");
         }

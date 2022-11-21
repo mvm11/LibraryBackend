@@ -63,12 +63,13 @@ public class BookService implements BookGateway {
 
     @Override
     public List<BookDTO> findBookByCategory(String category) {
-
-        List<Book> bookList = bookRepository.findAll();
-
-        List<Book> bookListFilteredByCategory = filterBookByCategory(category, bookList);
-
-        return validateFilteredBook(bookListFilteredByCategory, "category", category);
+//
+//        List<Book> bookList = bookRepository.findAll();
+//
+//        List<Book> bookListFilteredByCategory = filterBookByCategory(category, bookList);
+//
+//        return validateFilteredBook(bookListFilteredByCategory, "category", category);
+        return null;
     }
 
     @Override
@@ -139,31 +140,31 @@ public class BookService implements BookGateway {
                 .collect(Collectors.toList());
     }
 
-    private List<Book> filterBookByCategory(String category, List<Book> bookList) {
+//    private List<Book> filterBookByCategory(String category, List<Book> bookList) {
+//
+//
+//        Set<Category> bookCategories = getBookCategories(category, bookList);
+//
+//        return validateBookCategories(category, bookList, bookCategories);
+//    }
 
+//    private List<Book> validateBookCategories(String category, List<Book> bookList, Set<Category> bookCategories) {
+//        if(bookCategories.isEmpty()){
+//            throw new NotFoundException("Book", "category", category);
+//        }else{
+//            return bookList.stream()
+//                    .filter(book -> book.getCategories().containsAll(bookCategories))
+//                    .collect(Collectors.toList());
+//        }
+//    }
 
-        Set<Category> bookCategories = getBookCategories(category, bookList);
-
-        return validateBookCategories(category, bookList, bookCategories);
-    }
-
-    private List<Book> validateBookCategories(String category, List<Book> bookList, Set<Category> bookCategories) {
-        if(bookCategories.isEmpty()){
-            throw new NotFoundException("Book", "category", category);
-        }else{
-            return bookList.stream()
-                    .filter(book -> book.getCategories().containsAll(bookCategories))
-                    .collect(Collectors.toList());
-        }
-    }
-
-    private Set<Category> getBookCategories(String category, List<Book> bookList) {
-        return bookList.stream()
-                .map(Book::getCategories)
-                .flatMap(Collection::stream)
-                .filter(category1 -> category1.getName().equalsIgnoreCase(category))
-                .collect(Collectors.toSet());
-    }
+//    private Set<Category> getBookCategories(String category, List<Book> bookList) {
+//        return bookList.stream()
+//                .map(Book::getCategories)
+//                .flatMap(Collection::stream)
+//                .filter(category1 -> category1.getCategoryName().equalsIgnoreCase(category))
+//                .collect(Collectors.toSet());
+//    }
 
     @Override
     public BookDTO createBook(BookRequest bookRequest) {
@@ -179,7 +180,7 @@ public class BookService implements BookGateway {
                 .numberOfPages(bookRequest.getNumberOfPages())
                 .format(bookRequest.getFormat())
                 .publisher(publisher)
-                .categories(bookRequest.getCategories())
+                //.categories(bookRequest.getCategories())
                 .copies(bookRequest.getCopies())
                 .authors(bookRequest.getAuthors())
                 .build();
@@ -227,7 +228,7 @@ public class BookService implements BookGateway {
         book.setNumberOfPages(bookRequest.getNumberOfPages());
         book.setPublisher(publisher);
         book.setFormat(bookRequest.getFormat());
-        book.setCategories(bookRequest.getCategories());
+        //book.setCategories(bookRequest.getCategories());
         book.setAuthors(bookRequest.getAuthors());
 
         Book bookUpdated = bookRepository.save(book);

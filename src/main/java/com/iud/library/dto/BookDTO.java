@@ -1,13 +1,11 @@
 package com.iud.library.dto;
 
-import com.iud.library.entity.Author;
-import com.iud.library.entity.Category;
-import com.iud.library.entity.Copy;
-import com.iud.library.entity.Publisher;
+import com.iud.library.entity.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.mapping.Subclass;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
@@ -30,14 +28,13 @@ public class BookDTO {
     @Size(min = 2, message = "The book's isbn should have at least two characters")
     private String isbn;
 
-
     private Integer numberOfPages;
 
+    private String format;
 
     private Publisher publisher;
 
-
-    private String format;
+    private Category category;
 
     private List<Copy> copies;
 
@@ -45,6 +42,6 @@ public class BookDTO {
     private Set<Author> authors;
 
     @NotEmpty
-    private Set<Category> categories;
+    private Set<Subject> subjects;
 
 }
