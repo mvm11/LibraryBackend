@@ -9,5 +9,4 @@ import java.util.List;
 @Repository
 public interface SubjectRepository extends JpaRepository<Subject, Integer> {
 
-    public List<Subject> findByBookId(Integer bookId);
 }

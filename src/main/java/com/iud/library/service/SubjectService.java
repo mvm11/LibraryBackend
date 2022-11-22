@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,7 +35,6 @@ public class SubjectService implements SubjectGateway {
     public SubjectDTO saveSubject(Integer bookId, SubjectDTO subjectDTO) {
         Subject subject = convertDTOToSubject(subjectDTO);
         Book book = getBook(bookId);
-        subject.setBook(book);
         subjectRepository.save(subject);
         return convertSubjectToDTO(subject);
     }
@@ -45,16 +45,14 @@ public class SubjectService implements SubjectGateway {
     }
 
     @Override
-    public List<SubjectDTO> findAllSubjects() {
-        return subjectRepository.findAll()
-                .stream()
-                .map(this::convertSubjectToDTO)
-                .collect(Collectors.toList());
+    public List<SubjectDTO> findSubjectByBook(Integer bookId) {
+     return null;
     }
 
     @Override
-    public SubjectDTO findSubjectById(Integer subjectId) {
-        Subject subject = getSubject(subjectId);
+    public SubjectDTO findSubjectById(Integer bookId, Integer subjectId) {
+        Book book = getBook(bookId);
+        Subject subject  = getSubject(subjectId);
         return convertSubjectToDTO(subject);
     }
 
@@ -63,37 +61,15 @@ public class SubjectService implements SubjectGateway {
                 .orElseThrow(() -> new NotFoundException("Subject", "id", subjectId));
     }
 
-    @Override
-    public List<SubjectDTO> findSubjectByBook(Integer bookId) {
-        List<Subject> subjectList = subjectRepository.findByBookId(bookId);
-        return subjectList.stream()
-                .map(this::convertSubjectToDTO)
-                .collect(Collectors.toList());
-    }
 
-    @Override
-    public SubjectDTO findSubjectBySubjectAndBookId(Integer bookId, Integer subjectId) {
 
-        Book book = getBook(bookId);
-        Subject subject = getSubject(subjectId);
-
-        validateBookAndCopyId(book, subject);
-
-        return convertSubjectToDTO(subject);
-    }
-
-    private static void validateBookAndCopyId(Book book, Subject subject) {
-        if(!subject.getBook().getId().equals(book.getId())){
-            throw new LibraryException(HttpStatus.BAD_REQUEST, "the subject does not belong to the book");
-        }
-    }
 
     @Override
     public SubjectDTO updateSubject(Integer bookId, Integer subjectId, SubjectDTO subjectDTO) {
 
         Book book = getBook(bookId);
         Subject subject  = getSubject(subjectId);
-        validateBookAndCopyId(book, subject);
+
         subject.setSubjectName(subjectDTO.getSubjectName());
         subjectRepository.save(subject);
         return convertSubjectToDTO(subject);
@@ -103,7 +79,7 @@ public class SubjectService implements SubjectGateway {
     public void deleteCopy(Integer bookId, Integer copyId) {
         Book book = getBook(bookId);
         Subject subject = getSubject(copyId);
-        validateBookAndCopyId(book, subject);
+
         subjectRepository.delete(subject);
     }
 

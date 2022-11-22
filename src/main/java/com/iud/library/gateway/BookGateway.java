@@ -7,13 +7,16 @@ import java.util.List;
 
 public interface BookGateway {
 
-    List<BookDTO>  findAllBooks();
-    BookDTO findBookById(Integer bookId);
+    BookDTO createBook(Integer categoryId, BookRequest bookRequest);
+    List<BookDTO> findBookByCategory(Integer categoryId);
+    BookDTO findBookById(Integer categoryId, Integer bookId);
     List<BookDTO> findBookByPublisher(String publisher);
-    List<BookDTO> findBookByCategory(String category);
+    List<BookDTO> findBookByCategory(String categoryName);
     List<BookDTO> findBookByFormat(String format);
     List<BookDTO> findBookByAuthor(String author);
-    BookDTO createBook(BookRequest bookRequest);
-    void deleteBook(Integer bookId);
-    BookDTO updateBook(Integer bookId, BookRequest bookRequest);
+    BookDTO updateBook(Integer categoryId, Integer bookId, BookRequest bookRequest);
+    void deleteBook(Integer categoryId, Integer bookId);
+
+
+
 }

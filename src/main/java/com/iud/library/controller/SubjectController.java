@@ -1,5 +1,6 @@
 package com.iud.library.controller;
 
+import com.iud.library.dto.CopyDTO;
 import com.iud.library.dto.SubjectDTO;
 import com.iud.library.service.SubjectService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,22 @@ public class SubjectController {
     @Autowired
     private SubjectService subjectService;
 
+    @GetMapping(value = "/findSubjects/bookId/{bookId}")
+    public List<SubjectDTO>  findAllSubjects(@PathVariable(value = "bookId")Integer bookId){
+        return subjectService.findSubjectByBook(bookId);
+    }
+
+    @GetMapping("/findSubject/bookId/{bookId}/subjectId/{subjectId}")
+    public ResponseEntity<SubjectDTO> findSubjectById(
+            @PathVariable(value = "bookId") Integer bookId,
+            @PathVariable(value = "subjectId") Integer subjectId
+    ){
+        SubjectDTO subjectDTO = subjectService.findSubjectById(bookId, subjectId);
+        return new ResponseEntity<>(subjectDTO, HttpStatus.OK);
+
+    }
+
+
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/saveSubject/bookId/{bookId}")
     public ResponseEntity<SubjectDTO> saveSubject
@@ -25,37 +42,6 @@ public class SubjectController {
 
         return new ResponseEntity<>(subjectService.saveSubject(bookId, subjectDTO), HttpStatus.CREATED);
     }
-
-    @GetMapping(value = "/findAllSubjects")
-    public List<SubjectDTO>  findAllSubjects(){
-        return subjectService.findAllSubjects();
-    }
-
-    @GetMapping("/findSubjectById/subjectId/{subjectId}")
-    public ResponseEntity<SubjectDTO> findSubjectById(
-            @PathVariable(value = "subjectId") Integer subjectId
-    ){
-        SubjectDTO subjectDTO = subjectService.findSubjectById(subjectId);
-        return new ResponseEntity<>(subjectDTO, HttpStatus.OK);
-
-    }
-
-    @GetMapping("/findSubjectByBook/bookId/{bookId}")
-    public List<SubjectDTO> findSubjectByBook(@PathVariable(value = "bookId") Integer bookId){
-
-        return subjectService.findSubjectByBook(bookId);
-    }
-
-    @GetMapping("/findSubjectBySubjectAndBookId/bookId/{bookId}/subjectId/{subjectId}")
-    public ResponseEntity<SubjectDTO> findSubjectBySubjectAndBookId(
-            @PathVariable(value = "bookId") Integer bookId,
-            @PathVariable(value = "subjectId") Integer subjectId
-    ){
-        SubjectDTO subjectDTO = subjectService.findSubjectBySubjectAndBookId(bookId, subjectId);
-        return new ResponseEntity<>(subjectDTO, HttpStatus.OK);
-
-    }
-
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/updateSubject/bookId/{bookId}/subjectId/{subjectId}")
     public ResponseEntity<SubjectDTO> updateSubject(

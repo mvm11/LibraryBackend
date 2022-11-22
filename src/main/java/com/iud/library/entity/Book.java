@@ -1,6 +1,6 @@
 package com.iud.library.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.*;
 import com.iud.library.request.BookRequest;
 import lombok.*;
 
@@ -11,22 +11,22 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Builder
-@Table(name = "books", uniqueConstraints = { @UniqueConstraint(columnNames = { "title" }),
-        @UniqueConstraint(columnNames = { "isbn" }) })
-@Data
+@Table(name = "books")
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Book {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name="title", nullable = false)
+    @Column(name = "title", nullable = false, unique = true)
     private String title;
 
-    @Column(name="isbn", nullable = false)
+    @Column(name = "isbn", nullable = false, unique = true)
     private String isbn;
 
     @Column(name="numberOfPages", nullable = false)
@@ -35,24 +35,25 @@ public class Book {
     @Column(name="format", nullable = false)
     private String format;
 
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "publisher_id")
     private Publisher publisher;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
+    @JsonBackReference
     private Category category;
 
-    @JsonBackReference(value="book-copy")
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Copy> copies = new ArrayList<>();
 
-    @JsonBackReference(value="book-subject")
-    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Subject> subjects = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinTable(name = "book_authors", joinColumns = @JoinColumn(name = "book_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "author_id", referencedColumnName = "id"))
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Subject> subjects = new HashSet<>();
+
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Author> authors = new HashSet<>();
 
     public Book(BookRequest bookRequest) {

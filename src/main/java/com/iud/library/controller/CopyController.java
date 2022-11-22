@@ -18,7 +18,7 @@ public class CopyController {
     @Autowired
     private CopyService copyService;
 
-    @GetMapping("/{bookId}/copies/getCopies")
+    @GetMapping("/findCopies/bookId/{bookId}")
     public List<CopyDTO> findCopiesByBookId(@PathVariable(value = "bookId") Integer bookId){
 
         return copyService.findCopyByBook(bookId);

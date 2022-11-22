@@ -10,6 +10,5 @@ public interface CopyGateway {
     List<CopyDTO> findCopyByBook(Integer bookId);
     CopyDTO findCopyById(Integer bookId, Integer copyId);
     CopyDTO updateCopy(Integer bookId, Integer copyId, CopyDTO copyRequest);
-
     void deleteCopy(Integer bookId, Integer copyId);
 }

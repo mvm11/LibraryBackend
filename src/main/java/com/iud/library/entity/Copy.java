@@ -1,5 +1,7 @@
 package com.iud.library.entity;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,10 +18,10 @@ import javax.persistence.*;
 public class Copy {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    @Column(name="editionNumber", nullable = false)
+    @Column(name = "editionNumber", length = 30, nullable = false, unique = true)
     private String editionNumber;
 
     @Column(name="state", nullable = false)

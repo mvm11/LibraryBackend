@@ -1,6 +1,8 @@
 package com.iud.library.controller;
 
 import com.iud.library.dto.BookDTO;
+import com.iud.library.dto.CategoryDTO;
+import com.iud.library.dto.CopyDTO;
 import com.iud.library.request.BookRequest;
 import com.iud.library.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,57 +22,66 @@ public class BookController {
     @Autowired
     private BookService bookService;
 
-    // Find All
-    @GetMapping(value = "/getAllBooks")
-    public List<BookDTO>  findAllBooks(){
-        return bookService.findAllBooks();
+
+    @GetMapping(value = "/findBooks/categoryId/{categoryId}")
+    public List<BookDTO> findBooksByCategoryId(@PathVariable(value = "categoryId")Integer categoryId){
+        return bookService.findBookByCategory(categoryId);
     }
-    // Find by id
-    @GetMapping(value = "/getBookById/{id}")
-    public ResponseEntity<BookDTO> findBookById(@PathVariable Integer id) {
-        return ResponseEntity.ok(bookService.findBookById(id));
+
+    @GetMapping(value = "/findBook/categoryId/{categoryId}/bookId/{bookId}")
+    public ResponseEntity<BookDTO> findBookById(
+            @PathVariable(value = "categoryId") Integer categoryId,
+            @PathVariable(value = "bookId") Integer bookId
+    ) {
+        return ResponseEntity.ok(bookService.findBookById(categoryId, bookId));
     }
 
     // Find by publisher
-    @GetMapping(value = "/getBookByPublisher/{publisher}")
+    @GetMapping(value = "/getBookByPublisher/publisher/{publisher}")
     public ResponseEntity<List<BookDTO>> findBookByPublisher(@PathVariable String publisher) {
         return ResponseEntity.ok(bookService.findBookByPublisher(publisher));
     }
 
     // Find by category
-    @GetMapping(value = "/getBookByCategory/{category}")
-    public ResponseEntity<List<BookDTO>> findBookByCategory(@PathVariable String category) {
-        return ResponseEntity.ok(bookService.findBookByCategory(category));
+    @GetMapping(value = "/getBookByCategory/categoryName/{categoryName}")
+    public ResponseEntity<List<BookDTO>> findBookByCategory(@PathVariable String categoryName) {
+        return ResponseEntity.ok(bookService.findBookByCategory(categoryName));
     }
 
     // Find by format
-    @GetMapping(value = "/getBookByFormat/{format}")
+    @GetMapping(value = "/getBookByFormat/format/{format}")
     public ResponseEntity<List<BookDTO>> findBookByFormat(@PathVariable String format) {
         return ResponseEntity.ok(bookService.findBookByFormat(format));
     }
 
     // Find by author
-    @GetMapping(value = "/getBookByAuthor/{author}")
+    @GetMapping(value = "/getBookByAuthor/author/{author}")
     public ResponseEntity<List<BookDTO>> findBookByAuthor(@PathVariable String author) {
         return ResponseEntity.ok(bookService.findBookByAuthor(author));
     }
     // Save
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/saveBook")
-    ResponseEntity<BookDTO> saveBook(@Valid @RequestBody BookRequest bookRequest){
-        return new ResponseEntity<>(bookService.createBook(bookRequest), HttpStatus.CREATED);
+    @PostMapping("/saveBook/categoryId/{categoryId}")
+    ResponseEntity<BookDTO> saveBook(@Valid @PathVariable Integer categoryId, @RequestBody BookRequest bookRequest){
+        return new ResponseEntity<>(bookService.createBook(categoryId, bookRequest), HttpStatus.CREATED);
     }
     // Update
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/updateBook/{id}")
-    ResponseEntity<BookDTO> updateBook(@Valid @RequestBody BookRequest bookRequest, @PathVariable Integer id){
-        return new ResponseEntity<>(bookService.updateBook(id, bookRequest), HttpStatus.OK);
+    @PutMapping("/updateBook/categoryId/{categoryId}/bookId/{bookId}")
+    ResponseEntity<BookDTO> updateBook(
+            @PathVariable(value = "categoryId") Integer categoryId,
+            @PathVariable(value = "bookId") Integer bookId,
+            @RequestBody BookRequest bookRequest){
+        return new ResponseEntity<>(bookService.updateBook(categoryId, bookId, bookRequest), HttpStatus.OK);
     }
     //Delete
     @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("/deleteBook/{id}")
-    ResponseEntity<String> deleteBook(@PathVariable Integer id){
-        bookService.deleteBook(id);
+    @DeleteMapping("/deleteBook/categoryId/{categoryId}/bookId/{bookId}")
+    ResponseEntity<String> deleteBook(
+            @PathVariable(value = "categoryId") Integer categoryId,
+            @PathVariable(value = "bookId") Integer bookId
+    ){
+        bookService.deleteBook(categoryId, bookId);
         return new ResponseEntity<>("The book has been deleted successful",HttpStatus.NO_CONTENT);
     }
 }

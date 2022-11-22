@@ -2,12 +2,10 @@ package com.iud.library.service;
 
 import com.iud.library.common.exception.NotFoundException;
 import com.iud.library.dto.CategoryDTO;
-import com.iud.library.entity.Book;
 import com.iud.library.entity.Category;
 import com.iud.library.gateway.CategoryGateway;
 import com.iud.library.repository.BookRepository;
 import com.iud.library.repository.CategoryRepository;
-import com.iud.library.request.BookRequest;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

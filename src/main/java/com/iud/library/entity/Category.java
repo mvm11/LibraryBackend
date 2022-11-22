@@ -1,6 +1,6 @@
 package com.iud.library.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.*;
 import lombok.*;
 
 import javax.persistence.*;
@@ -13,15 +13,19 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Category {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     private Integer id;
-    @Column(name="name", nullable = false)
+
+    @Column(name = "categoryName", length = 30, nullable = false, unique = true)
     private String categoryName;
 
-    @JsonBackReference(value = "category-book")
+
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<Book> books = new ArrayList<>();
 }

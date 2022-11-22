@@ -18,6 +18,6 @@ public class AuthorDTO {
 
     @NotEmpty
     @Size(min = 2, message = "The author's name should have at least two characters")
-    private String name;
+    private String authorName;
 
 }
