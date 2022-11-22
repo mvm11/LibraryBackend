@@ -4,6 +4,7 @@ import com.iud.library.common.exception.LibraryException;
 import com.iud.library.common.exception.NotFoundException;
 import com.iud.library.dto.SubjectDTO;
 import com.iud.library.entity.Book;
+import com.iud.library.entity.Copy;
 import com.iud.library.entity.Subject;
 import com.iud.library.gateway.SubjectGateway;
 import com.iud.library.repository.BookRepository;
@@ -33,8 +34,9 @@ public class SubjectService implements SubjectGateway {
 
     @Override
     public SubjectDTO saveSubject(Integer bookId, SubjectDTO subjectDTO) {
-        Subject subject = convertDTOToSubject(subjectDTO);
         Book book = getBook(bookId);
+        Subject subject = convertDTOToSubject(subjectDTO);
+        subject.setBook(book);
         subjectRepository.save(subject);
         return convertSubjectToDTO(subject);
     }
@@ -46,14 +48,24 @@ public class SubjectService implements SubjectGateway {
 
     @Override
     public List<SubjectDTO> findSubjectByBook(Integer bookId) {
-     return null;
+        List<Subject> subjects = subjectRepository.findByBookId(bookId);
+        return subjects.stream()
+                .map(this::convertSubjectToDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
     public SubjectDTO findSubjectById(Integer bookId, Integer subjectId) {
         Book book = getBook(bookId);
         Subject subject  = getSubject(subjectId);
+        validateBookAndSubjectId(book, subject);
         return convertSubjectToDTO(subject);
+    }
+
+    private void validateBookAndSubjectId(Book book, Subject subject) {
+        if(!subject.getBook().getId().equals(book.getId())){
+            throw new LibraryException(HttpStatus.BAD_REQUEST, "the subject does not belong to the book");
+        }
     }
 
     private Subject getSubject(Integer subjectId) {

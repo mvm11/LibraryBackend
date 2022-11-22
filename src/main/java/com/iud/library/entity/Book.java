@@ -46,14 +46,17 @@ public class Book {
     private Category category;
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonBackReference(value = "copies")
     private List<Copy> copies = new ArrayList<>();
 
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonBackReference(value = "subjects")
     private Set<Subject> subjects = new HashSet<>();
 
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonBackReference(value = "authors")
     private Set<Author> authors = new HashSet<>();
 
     public Book(BookRequest bookRequest) {

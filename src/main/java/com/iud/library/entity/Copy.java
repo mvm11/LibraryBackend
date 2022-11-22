@@ -18,7 +18,7 @@ import javax.persistence.*;
 public class Copy {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column(name = "editionNumber", length = 30, nullable = false, unique = true)
