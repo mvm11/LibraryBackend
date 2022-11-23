@@ -7,7 +7,8 @@ import com.iud.library.dto.CategoryDTO;
 import com.iud.library.entity.*;
 import com.iud.library.gateway.BookGateway;
 import com.iud.library.repository.*;
-import com.iud.library.request.BookRequest;
+import com.iud.library.request.SavingBookRequest;
+import com.iud.library.request.UpdatingBookRequest;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -44,22 +45,22 @@ public class BookService implements BookGateway {
     private ModelMapper modelMapper;
 
     @Override
-    public BookDTO createBook(Integer categoryId, BookRequest bookRequest) {
+    public BookDTO createBook(Integer categoryId, SavingBookRequest savingBookRequest) {
 
         Book book = new Book();
 
         Category category = getCategory(categoryId);
 
-        Publisher publisher = getPublisherByBookRequest(bookRequest);
+        Publisher publisher = getPublisherByBookRequest(savingBookRequest);
 
-        validatePublisher(bookRequest, publisher);
+        validatePublisher(savingBookRequest, publisher);
 
-        validateBookRequest(bookRequest);
+        validateBookRequest(savingBookRequest);
 
-        book.setTitle(bookRequest.getTitle());
-        book.setIsbn(bookRequest.getIsbn());
-        book.setNumberOfPages(bookRequest.getNumberOfPages());
-        book.setFormat(bookRequest.getFormat());
+        book.setTitle(savingBookRequest.getTitle());
+        book.setIsbn(savingBookRequest.getIsbn());
+        book.setNumberOfPages(savingBookRequest.getNumberOfPages());
+        book.setFormat(savingBookRequest.getFormat());
         book.setPublisher(publisher);
         book.setCategory(category);
 
@@ -70,12 +71,12 @@ public class BookService implements BookGateway {
         bookRepository.save(book);
 
         // save subjects
-        bookRequest.getSubjects().forEach(subject -> subject.setBook(book));
-        subjectRepository.saveAll(bookRequest.getSubjects());
+        savingBookRequest.getSubjects().forEach(subject -> subject.setBook(book));
+        subjectRepository.saveAll(savingBookRequest.getSubjects());
 
         // save authors
-        bookRequest.getAuthors().forEach(author -> author.setBook(book));
-        authorRepository.saveAll(bookRequest.getAuthors());
+        savingBookRequest.getAuthors().forEach(author -> author.setBook(book));
+        authorRepository.saveAll(savingBookRequest.getAuthors());
 
         //Load the cron expression from database
         taskScheduler.schedule(
@@ -84,8 +85,8 @@ public class BookService implements BookGateway {
         );
 
         //setting values
-        book.setSubjects(bookRequest.getSubjects());
-        book.setAuthors(bookRequest.getAuthors());
+        book.setSubjects(savingBookRequest.getSubjects());
+        book.setAuthors(savingBookRequest.getAuthors());
 
         // Parse from Entity to DTO
         return convertBookToDTO(book);
@@ -96,22 +97,22 @@ public class BookService implements BookGateway {
                 .orElseThrow(() -> new NotFoundException("Category", "id", categoryId));
     }
 
-    private Publisher getPublisherByBookRequest(BookRequest bookRequest) {
+    private Publisher getPublisherByBookRequest(SavingBookRequest savingBookRequest) {
         return publisherRepository.findAll()
                 .stream()
-                .filter(publisher1 -> publisher1.getPublisherName().equalsIgnoreCase(bookRequest.getPublisherName()))
+                .filter(publisher1 -> publisher1.getPublisherName().equalsIgnoreCase(savingBookRequest.getPublisherName()))
                 .findFirst()
                 .orElse(new Publisher());
     }
 
-    private void validatePublisher(BookRequest bookRequest, Publisher publisher) {
+    private void validatePublisher(SavingBookRequest savingBookRequest, Publisher publisher) {
         if(publisher.getPublisherName() == null){
-            publisher.setPublisherName(bookRequest.getPublisherName());
+            publisher.setPublisherName(savingBookRequest.getPublisherName());
         }
     }
 
-    private void validateBookRequest(BookRequest bookRequest) {
-        if(validateBookRequestFields(bookRequest)){
+    private void validateBookRequest(SavingBookRequest savingBookRequest) {
+        if(validateBookRequestFields(savingBookRequest)){
             throw new LibraryException(HttpStatus.BAD_REQUEST, "subjects and authors cannot be null");
         }
     }
@@ -249,11 +250,11 @@ public class BookService implements BookGateway {
 
 
 
-    private boolean validateBookRequestFields(BookRequest bookRequest) {
-        return bookRequest.getAuthors() == null ||
-                bookRequest.getAuthors().isEmpty() ||
-                bookRequest.getSubjects() == null ||
-                bookRequest.getSubjects().isEmpty();
+    private boolean validateBookRequestFields(SavingBookRequest savingBookRequest) {
+        return savingBookRequest.getAuthors() == null ||
+                savingBookRequest.getAuthors().isEmpty() ||
+                savingBookRequest.getSubjects() == null ||
+                savingBookRequest.getSubjects().isEmpty();
     }
 
 
@@ -278,15 +279,15 @@ public class BookService implements BookGateway {
     }
 
     @Override
-    public BookDTO updateBook(Integer categoryId, Integer bookId, BookRequest bookRequest) {
+    public BookDTO updateBook(Integer categoryId, Integer bookId, UpdatingBookRequest updatingBookRequest) {
         Category category = getCategory(categoryId);
         Book book = getBook(bookId);
         validateCategoryAndBookId(category, book);
         // Set the DTO values into the found book
-        book.setTitle(bookRequest.getTitle());
-        book.setIsbn(bookRequest.getIsbn());
-        book.setNumberOfPages(bookRequest.getNumberOfPages());
-        book.setFormat(bookRequest.getFormat());
+        book.setTitle(updatingBookRequest.getTitle());
+        book.setIsbn(updatingBookRequest.getIsbn());
+        book.setNumberOfPages(updatingBookRequest.getNumberOfPages());
+        book.setFormat(updatingBookRequest.getFormat());
         bookRepository.save(book);
         return convertBookToDTO(book);
     }

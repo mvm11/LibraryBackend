@@ -32,10 +32,25 @@ public class AuthorService implements AuthorGateway {
     @Override
     public AuthorDTO saveAuthor(Integer bookId, AuthorDTO authorDTO) {
         Book book = getBook(bookId);
+        List<Author> authorList = getDuplicateAuthors(authorDTO, book);
+        validateAuthor(authorList);
         Author author = convertDTOToAuthor(authorDTO);
         author.setBook(book);
         authorRepository.save(author);
         return convertAuthorToDTO(author);
+    }
+
+    private void validateAuthor(List<Author> authorList) {
+        if(!authorList.isEmpty()){
+            throw new LibraryException(HttpStatus.BAD_REQUEST, "The book actually has that author");
+        }
+    }
+
+    private List<Author> getDuplicateAuthors(AuthorDTO authorDTO, Book book) {
+        return book.getAuthors()
+                .stream()
+                .filter(author -> author.getAuthorName().equalsIgnoreCase(authorDTO.getAuthorName()))
+                .collect(Collectors.toList());
     }
 
     private Book getBook(Integer bookId) {

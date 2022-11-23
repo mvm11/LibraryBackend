@@ -35,10 +35,22 @@ public class SubjectService implements SubjectGateway {
     @Override
     public SubjectDTO saveSubject(Integer bookId, SubjectDTO subjectDTO) {
         Book book = getBook(bookId);
+        List<Subject> subjectList = getDuplicateSubjects(subjectDTO, book);
+        validateSubject(subjectList);
         Subject subject = convertDTOToSubject(subjectDTO);
         subject.setBook(book);
         subjectRepository.save(subject);
         return convertSubjectToDTO(subject);
+    }
+
+    private void validateSubject(List<Subject> subjectList) {
+        if(!subjectList.isEmpty()){
+            throw new LibraryException(HttpStatus.BAD_REQUEST, "The book actually has that subject");
+        }
+    }
+
+    private List<Subject> getDuplicateSubjects(SubjectDTO subjectDTO, Book book) {
+        return book.getSubjects().stream().filter(subject -> subject.getSubjectName().equalsIgnoreCase(subjectDTO.getSubjectName())).collect(Collectors.toList());
     }
 
     private Book getBook(Integer bookId) {

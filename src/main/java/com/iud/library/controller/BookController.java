@@ -1,9 +1,8 @@
 package com.iud.library.controller;
 
 import com.iud.library.dto.BookDTO;
-import com.iud.library.dto.CategoryDTO;
-import com.iud.library.dto.CopyDTO;
-import com.iud.library.request.BookRequest;
+import com.iud.library.request.SavingBookRequest;
+import com.iud.library.request.UpdatingBookRequest;
 import com.iud.library.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -68,8 +67,8 @@ public class BookController {
     // Save
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/saveBook/categoryId/{categoryId}")
-    ResponseEntity<BookDTO> saveBook(@Valid @PathVariable Integer categoryId, @RequestBody BookRequest bookRequest){
-        return new ResponseEntity<>(bookService.createBook(categoryId, bookRequest), HttpStatus.CREATED);
+    ResponseEntity<BookDTO> saveBook(@Valid @PathVariable Integer categoryId, @RequestBody SavingBookRequest savingBookRequest){
+        return new ResponseEntity<>(bookService.createBook(categoryId, savingBookRequest), HttpStatus.CREATED);
     }
     // Update
     @PreAuthorize("hasRole('ADMIN')")
@@ -77,8 +76,8 @@ public class BookController {
     ResponseEntity<BookDTO> updateBook(
             @PathVariable(value = "categoryId") Integer categoryId,
             @PathVariable(value = "bookId") Integer bookId,
-            @RequestBody BookRequest bookRequest){
-        return new ResponseEntity<>(bookService.updateBook(categoryId, bookId, bookRequest), HttpStatus.OK);
+            @RequestBody UpdatingBookRequest updatingBookRequest){
+        return new ResponseEntity<>(bookService.updateBook(categoryId, bookId, updatingBookRequest), HttpStatus.OK);
     }
     //Delete
     @PreAuthorize("hasRole('ADMIN')")

@@ -30,7 +30,10 @@ public class CopyService implements CopyGateway {
 
     @Override
     public CopyDTO saveCopy(Integer bookId, CopyDTO copyDTO) {
-        Copy copy = convertDTOToCopy(copyDTO);
+        Copy copy = new Copy();
+        copy.setEditionNumber(copyDTO.getEditionNumber());
+        copy.setState(copy.getState());
+        copy.setLend(false);
         Book book = getBook(bookId);
         copy.setBook(book);
         Copy newCopy = copyRepository.save(copy);

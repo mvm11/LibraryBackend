@@ -1,7 +1,7 @@
 package com.iud.library.entity;
 
 import com.fasterxml.jackson.annotation.*;
-import com.iud.library.request.BookRequest;
+import com.iud.library.request.SavingBookRequest;
 import lombok.*;
 
 import javax.persistence.*;
@@ -59,10 +59,10 @@ public class Book {
     @JsonBackReference(value = "authors")
     private Set<Author> authors = new HashSet<>();
 
-    public Book(BookRequest bookRequest) {
-        this.title = bookRequest.getTitle();
-        this.isbn = bookRequest.getIsbn();
-        this.numberOfPages = bookRequest.getNumberOfPages();
-        this.format = bookRequest.getFormat();
+    public Book(SavingBookRequest savingBookRequest) {
+        this.title = savingBookRequest.getTitle();
+        this.isbn = savingBookRequest.getIsbn();
+        this.numberOfPages = savingBookRequest.getNumberOfPages();
+        this.format = savingBookRequest.getFormat();
     }
 }

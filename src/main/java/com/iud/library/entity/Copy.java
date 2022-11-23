@@ -12,7 +12,6 @@ import javax.persistence.*;
 @Entity
 @Table(name = "copies")
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Copy {

@@ -9,7 +9,6 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class AuthorDTO {
