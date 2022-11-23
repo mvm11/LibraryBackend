@@ -54,7 +54,7 @@ public class BookService implements BookGateway {
 
         validatePublisher(bookRequest, publisher);
 
-        //validateBookRequest(bookRequest);
+        validateBookRequest(bookRequest);
 
         book.setTitle(bookRequest.getTitle());
         book.setIsbn(bookRequest.getIsbn());
@@ -66,17 +66,26 @@ public class BookService implements BookGateway {
         //Save publisher
         publisherRepository.save(publisher);
 
-        //SaveCategory
-        categoryRepository.save(book.getCategory());
-
         // Save Book into the repository
         bookRepository.save(book);
+
+        // save subjects
+        bookRequest.getSubjects().forEach(subject -> subject.setBook(book));
+        subjectRepository.saveAll(bookRequest.getSubjects());
+
+        // save authors
+        bookRequest.getAuthors().forEach(author -> author.setBook(book));
+        authorRepository.saveAll(bookRequest.getAuthors());
 
         //Load the cron expression from database
         taskScheduler.schedule(
                 this::startJob,
                 new Date(OffsetDateTime.now().plusSeconds(10).toInstant().toEpochMilli())
         );
+
+        //setting values
+        book.setSubjects(bookRequest.getSubjects());
+        book.setAuthors(bookRequest.getAuthors());
 
         // Parse from Entity to DTO
         return convertBookToDTO(book);
@@ -241,7 +250,10 @@ public class BookService implements BookGateway {
 
 
     private boolean validateBookRequestFields(BookRequest bookRequest) {
-        return bookRequest.getAuthors() == null || bookRequest.getAuthors().isEmpty() || bookRequest.getSubjects() == null || bookRequest.getSubjects().isEmpty();
+        return bookRequest.getAuthors() == null ||
+                bookRequest.getAuthors().isEmpty() ||
+                bookRequest.getSubjects() == null ||
+                bookRequest.getSubjects().isEmpty();
     }
 
 

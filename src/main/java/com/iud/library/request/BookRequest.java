@@ -36,11 +36,10 @@ public class BookRequest {
     @NotEmpty
     private String publisherName;
 
-
+    @NotEmpty
     private Set<Subject> subjects = new HashSet<>();
 
-
+    @NotEmpty
     private Set<Author> authors = new HashSet<>();
-
 
 }
