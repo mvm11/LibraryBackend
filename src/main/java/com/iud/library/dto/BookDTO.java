@@ -35,12 +35,12 @@ public class BookDTO {
 
     private Category category;
 
-    private List<Copy> copies;
+    @NotEmpty
+    private Set<Subject> subjects;
 
     @NotEmpty
     private Set<Author> authors;
 
-    @NotEmpty
-    private Set<Subject> subjects;
+    private List<Copy> copies;
 
 }

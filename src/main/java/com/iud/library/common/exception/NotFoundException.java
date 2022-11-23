@@ -14,14 +14,14 @@ public class NotFoundException extends RuntimeException{
     private long valueId;
 
     public NotFoundException(String resource, String name, long valueId) {
-        super(String.format("%s hasn't found with %s : '%s'", resource, name, valueId));
+        super(String.format("%s hasn't been found with %s : '%s'", resource, name, valueId));
         this.resource = resource;
         this.name = name;
         this.valueId = valueId;
     }
 
     public NotFoundException(String resource, String name, String value) {
-        super(String.format("%s hasn't found with %s : '%s'", resource, name, value));
+        super(String.format("%s hasn't been found with %s : '%s'", resource, name, value));
         this.resource = resource;
         this.name = name;
         this.value = value;
