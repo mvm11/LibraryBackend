@@ -8,6 +8,7 @@ import com.iud.library.entity.Copy;
 import com.iud.library.gateway.CopyGateway;
 import com.iud.library.repository.BookRepository;
 import com.iud.library.repository.CopyRepository;
+import com.iud.library.request.UpdatingCopyRequest;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,12 +33,12 @@ public class CopyService implements CopyGateway {
     public CopyDTO saveCopy(Integer bookId, CopyDTO copyDTO) {
         Copy copy = new Copy();
         copy.setEditionNumber(copyDTO.getEditionNumber());
-        copy.setState(copy.getState());
+        copy.setState(copyDTO.getState());
         copy.setLend(false);
         Book book = getBook(bookId);
         copy.setBook(book);
-        Copy newCopy = copyRepository.save(copy);
-        return convertCopyToDTO(newCopy);
+        copyRepository.save(copy);
+        return convertCopyToDTO(copy);
     }
 
     private Book getBook(Integer bookId) {
@@ -75,12 +76,12 @@ public class CopyService implements CopyGateway {
     }
 
     @Override
-    public CopyDTO updateCopy(Integer bookId, Integer copyId, CopyDTO copyRequest) {
+    public CopyDTO updateCopy(Integer bookId, Integer copyId, UpdatingCopyRequest updatingCopyRequest) {
         Book book = getBook(bookId);
         Copy copy  = getCopy(copyId);
         validateBookAndCopyId(book, copy);
-
-        copy.setEditionNumber(copyRequest.getEditionNumber());
+        copy.setEditionNumber(updatingCopyRequest.getEditionNumber());
+        copy.setState(updatingCopyRequest.getState());
 
         Copy updatedCopy = copyRepository.save(copy);
         return convertCopyToDTO(updatedCopy);

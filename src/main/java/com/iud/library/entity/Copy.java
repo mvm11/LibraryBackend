@@ -23,7 +23,7 @@ public class Copy {
     @Column(name = "editionNumber", length = 30, nullable = false, unique = true)
     private String editionNumber;
 
-    @Column(name="state", nullable = false)
+    @Column(name="state")
     private String state;
 
     @OneToOne(mappedBy = "copy")

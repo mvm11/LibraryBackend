@@ -2,7 +2,7 @@ package com.iud.library.security;
 
 import com.iud.library.entity.LibraryUser;
 import com.iud.library.entity.Role;
-import com.iud.library.repository.UserRepository;
+import com.iud.library.repository.LibraryUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -19,11 +19,11 @@ import java.util.stream.Collectors;
 public class CustomUserDetailsService implements UserDetailsService{
 
     @Autowired
-    private UserRepository userRepository;
+    private LibraryUserRepository libraryUserRepository;
 
     @Override
     public UserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
-        LibraryUser libraryUser = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
+        LibraryUser libraryUser = libraryUserRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with that username or email: " + usernameOrEmail));
 
         return new org.springframework.security.core.userdetails.User(libraryUser.getEmail(), libraryUser.getPassword(), mapRoles(libraryUser.getRoles()));
