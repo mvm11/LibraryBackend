@@ -1,6 +1,5 @@
 package com.iud.library.controller;
 
-import com.iud.library.dto.CopyDTO;
 import com.iud.library.dto.LoanDTO;
 import com.iud.library.request.SavingLoanRequest;
 import com.iud.library.service.LoanService;

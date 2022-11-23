@@ -2,9 +2,7 @@ package com.iud.library.controller;
 
 
 import com.iud.library.dto.AuthorDTO;
-import com.iud.library.dto.SubjectDTO;
 import com.iud.library.service.AuthorService;
-import com.iud.library.service.SubjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

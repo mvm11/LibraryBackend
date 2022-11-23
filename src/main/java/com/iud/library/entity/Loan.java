@@ -1,16 +1,12 @@
 package com.iud.library.entity;
 
 
-
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.util.Date;
 
 @Entity
 @Table(name = "loans")
@@ -27,8 +23,9 @@ public class Loan {
     private LocalDate finishDate;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "fk_copy")
+    @JoinColumn(name = "copyId")
     private Copy copy;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "library_user_id", nullable = false)

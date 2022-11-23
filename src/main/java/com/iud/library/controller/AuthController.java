@@ -5,8 +5,8 @@ import com.iud.library.dto.LoginDTO;
 import com.iud.library.dto.RegisterDTO;
 import com.iud.library.entity.LibraryUser;
 import com.iud.library.entity.Role;
-import com.iud.library.repository.RoleRepository;
 import com.iud.library.repository.LibraryUserRepository;
+import com.iud.library.repository.RoleRepository;
 import com.iud.library.security.JWTAuthResponseDTO;
 import com.iud.library.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,8 +82,8 @@ public class AuthController {
                 .password(passwordEncoder.encode(registerDTO.getPassword()))
                 .build();
 
-        Role roles = roleRepository.findByName(AppConstants.ROLE_ADMIN).get();
-        libraryUser.setRoles(Collections.singleton(roles));
+        Role adminRole = roleRepository.findByName(AppConstants.ROLE_ADMIN).get();
+        libraryUser.setRole(adminRole);
 
         libraryUserRepository.save(libraryUser);
         return new ResponseEntity<>("The admin has been register successful",HttpStatus.OK);
@@ -115,8 +115,8 @@ public class AuthController {
                 .password(passwordEncoder.encode(registerDTO.getPassword()))
                 .build();
 
-        Role roles = roleRepository.findByName(AppConstants.ROLE_TEACHER).get();
-        libraryUser.setRoles(Collections.singleton(roles));
+        Role teacherRole = roleRepository.findByName(AppConstants.ROLE_TEACHER).get();
+        libraryUser.setRole(teacherRole);
 
         libraryUserRepository.save(libraryUser);
         return new ResponseEntity<>("The teacher has been register successful",HttpStatus.OK);
@@ -147,8 +147,8 @@ public class AuthController {
                 .password(passwordEncoder.encode(registerDTO.getPassword()))
                 .build();
 
-        Role roles = roleRepository.findByName(AppConstants.ROLE_STUDENT).get();
-        libraryUser.setRoles(Collections.singleton(roles));
+        Role studentRole = roleRepository.findByName(AppConstants.ROLE_STUDENT).get();
+        libraryUser.setRole(studentRole);
 
         libraryUserRepository.save(libraryUser);
         return new ResponseEntity<>("The student has been register successful",HttpStatus.OK);

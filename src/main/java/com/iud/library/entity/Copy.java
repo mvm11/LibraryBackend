@@ -1,9 +1,6 @@
 package com.iud.library.entity;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -25,9 +22,6 @@ public class Copy {
 
     @Column(name="state")
     private String state;
-
-    @OneToOne(mappedBy = "copy")
-    private Loan loan;
 
     private boolean isLend;
 

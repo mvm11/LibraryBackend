@@ -2,7 +2,6 @@ package com.iud.library.controller;
 
 
 import com.iud.library.dto.CategoryDTO;
-import com.iud.library.entity.Category;
 import com.iud.library.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

@@ -4,7 +4,6 @@ import com.iud.library.common.exception.LibraryException;
 import com.iud.library.common.exception.NotFoundException;
 import com.iud.library.dto.SubjectDTO;
 import com.iud.library.entity.Book;
-import com.iud.library.entity.Copy;
 import com.iud.library.entity.Subject;
 import com.iud.library.gateway.SubjectGateway;
 import com.iud.library.repository.BookRepository;
@@ -15,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service

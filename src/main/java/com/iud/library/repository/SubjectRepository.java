@@ -1,6 +1,5 @@
 package com.iud.library.repository;
 
-import com.iud.library.entity.Copy;
 import com.iud.library.entity.Subject;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

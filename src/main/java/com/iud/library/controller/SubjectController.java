@@ -1,6 +1,5 @@
 package com.iud.library.controller;
 
-import com.iud.library.dto.CopyDTO;
 import com.iud.library.dto.SubjectDTO;
 import com.iud.library.service.SubjectService;
 import org.springframework.beans.factory.annotation.Autowired;

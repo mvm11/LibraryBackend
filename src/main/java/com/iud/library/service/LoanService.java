@@ -16,13 +16,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -53,22 +50,17 @@ public class LoanService implements LoanGateway {
 
         validateAvailableCopies(copies);
 
-        // Validate the user's role student
-        Role libraryUserStudent = getStudent(libraryUser);
-
-        // Validate the user's role teacher
-        Role libraryUserTeacher = getTeacher(libraryUser);
-
-        if(libraryUser.getRoles().contains(libraryUserStudent)){
-            validateStudentLoans(libraryUser, copies);
-        } else if (libraryUser.getRoles().contains(libraryUserTeacher)){
+        if(libraryUser.getRole().getName().equalsIgnoreCase("ROLE_STUDENT")){
+            return validateStudentLoans(libraryUser, copies);
+        } else if (libraryUser.getRole().getName().equalsIgnoreCase("ROLE_TEACHER")){
             Random random = new SecureRandom();
             Loan loan = new Loan();
             loan.setStartDate(LocalDate.now());
             loan.setFinishDate(loan.getStartDate().plus(1, ChronoUnit.WEEKS));
             Copy copy = copies.get(random.nextInt(copies.size()));
             copy.setLend(true);
-            copy.setLoan(loan);
+            copyRepository.save(copy);
+            loan.setCopy(copy);
             loanRepository.save(loan);
             return convertLoanToDTO(loan);
         }
@@ -97,22 +89,12 @@ public class LoanService implements LoanGateway {
             loan.setFinishDate(loan.getStartDate().plus(1, ChronoUnit.WEEKS));
             Copy copy = copies.get(random.nextInt(copies.size()));
             copy.setLend(true);
-            copy.setLoan(loan);
+            copyRepository.save(copy);
+            loan.setCopy(copy);
+            loan.setLibraryUser(libraryUser);
             loanRepository.save(loan);
             return convertLoanToDTO(loan);
         }
-    }
-
-    private Role getStudent(LibraryUser libraryUser) {
-        return libraryUser.getRoles().stream().filter(role -> role.getName().equalsIgnoreCase("ROLE_STUDENT"))
-                .findFirst()
-                .orElse(null);
-    }
-
-    private Role getTeacher(LibraryUser libraryUser) {
-        return libraryUser.getRoles().stream().filter(role -> role.getName().equalsIgnoreCase("ROLE_STUDENT"))
-                .findFirst()
-                .orElse(null);
     }
     private void validateAvailableCopies(List<Copy> copies) {
         if(copies.isEmpty()){
