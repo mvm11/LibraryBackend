@@ -20,7 +20,7 @@ public class Subject {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    @Column(name = "subjectName", length = 30, nullable = false, unique = true)
+
     private String subjectName;
 
     @ManyToOne(fetch = FetchType.LAZY)

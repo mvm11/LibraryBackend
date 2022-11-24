@@ -8,7 +8,7 @@ import com.iud.library.entity.Copy;
 import com.iud.library.gateway.CopyGateway;
 import com.iud.library.repository.BookRepository;
 import com.iud.library.repository.CopyRepository;
-import com.iud.library.request.UpdatingCopyRequest;
+import com.iud.library.request.copy.UpdatingCopyRequest;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

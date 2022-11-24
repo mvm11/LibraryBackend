@@ -1,7 +1,7 @@
 package com.iud.library.gateway;
 
 import com.iud.library.dto.CopyDTO;
-import com.iud.library.request.UpdatingCopyRequest;
+import com.iud.library.request.copy.UpdatingCopyRequest;
 
 import java.util.List;
 

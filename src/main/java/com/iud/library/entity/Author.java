@@ -17,7 +17,7 @@ public class Author {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @Column(name = "authorName", nullable = false, unique = true)
+
     private String authorName;
 
     @ManyToOne(fetch = FetchType.LAZY)

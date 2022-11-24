@@ -1,8 +1,8 @@
 package com.iud.library.controller;
 
 import com.iud.library.dto.BookDTO;
-import com.iud.library.request.SavingBookRequest;
-import com.iud.library.request.UpdatingBookRequest;
+import com.iud.library.request.book.SavingBookRequest;
+import com.iud.library.request.book.UpdatingBookRequest;
 import com.iud.library.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

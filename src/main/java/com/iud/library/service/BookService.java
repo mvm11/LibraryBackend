@@ -7,17 +7,14 @@ import com.iud.library.dto.CategoryDTO;
 import com.iud.library.entity.*;
 import com.iud.library.gateway.BookGateway;
 import com.iud.library.repository.*;
-import com.iud.library.request.SavingBookRequest;
-import com.iud.library.request.UpdatingBookRequest;
+import com.iud.library.request.book.SavingBookRequest;
+import com.iud.library.request.book.UpdatingBookRequest;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 
-import java.time.OffsetDateTime;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -164,63 +161,27 @@ public class BookService implements BookGateway {
     @Override
     public List<BookDTO> findBookByAuthor(String author) {
         List<Book> bookList = bookRepository.findAll();
-        List<Book> bookListFilteredByAuthor = filterBookByAuthor(author, bookList);
-        return validateFilteredBook(bookListFilteredByAuthor, "author", author);
+
+        return bookList.stream()
+                .filter(book -> book.getAuthors().stream().anyMatch(author1 -> author1.getAuthorName().equalsIgnoreCase(author)))
+                .collect(Collectors.toList())
+                .stream()
+                .map(this::convertBookToDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<BookDTO> findBookBySubject(String subject) {
         List<Book> bookList = bookRepository.findAll();
-        List<Book> bookListFilteredBySubject = filterBookBySubject(subject, bookList);
-        return validateFilteredBook(bookListFilteredBySubject, "author", subject);
-    }
 
-    private List<Book> filterBookBySubject(String subject, List<Book> bookList) {
-        Set<Subject> bookSubjects = getBookSubject(subject, bookList);
-        return validateBookSubject(subject, bookList, bookSubjects);
-    }
-
-    private List<Book> validateBookSubject(String subject, List<Book> bookList, Set<Subject> bookSubjects) {
-        if(bookSubjects.isEmpty()){
-            throw new NotFoundException("Book", "subject", subject);
-        }else{
-            return bookList.stream()
-                    .filter(book -> book.getSubjects().containsAll(bookSubjects))
-                    .collect(Collectors.toList());
-        }
-    }
-
-    private Set<Subject> getBookSubject(String subject, List<Book> bookList) {
         return bookList.stream()
-                .map(Book::getSubjects)
-                .flatMap(Collection::stream)
-                .filter(subject1 -> subject1.getSubjectName().equalsIgnoreCase(subject))
-                .collect(Collectors.toSet());
-    }
+                .filter(book -> book.getSubjects().stream().anyMatch(subject1 -> subject1.getSubjectName().equalsIgnoreCase(subject)))
+                .collect(Collectors.toList())
+                .stream()
+                .map(this::convertBookToDTO)
+                .collect(Collectors.toList());
 
-    private List<Book> filterBookByAuthor(String author, List<Book> bookList) {
-        Set<Author> bookAuthors = getBookAuthor(author, bookList);
-        return validateBookAuthor(author, bookList, bookAuthors);
     }
-
-    private List<Book> validateBookAuthor(String author, List<Book> bookList, Set<Author> bookAuthors) {
-        if(bookAuthors.isEmpty()){
-            throw new NotFoundException("Book", "author", author);
-        }else{
-            return bookList.stream()
-                    .filter(book -> book.getAuthors().containsAll(bookAuthors))
-                    .collect(Collectors.toList());
-        }
-    }
-
-    private Set<Author> getBookAuthor(String author, List<Book> bookList) {
-        return bookList.stream()
-                .map(Book::getAuthors)
-                .flatMap(Collection::stream)
-                .filter(author1 -> author1.getAuthorName().equalsIgnoreCase(author))
-                .collect(Collectors.toSet());
-    }
-
     private List<Book> filterBookByFormat(String format, List<Book> bookList) {
         return bookList.stream()
                 .filter(book -> book.getFormat().equalsIgnoreCase(format))
@@ -242,8 +203,6 @@ public class BookService implements BookGateway {
                 .filter(book -> book.getPublisher().getPublisherName().equalsIgnoreCase(publisher))
                 .collect(Collectors.toList());
     }
-
-
 
     private boolean validateBookRequestFields(SavingBookRequest savingBookRequest) {
         return savingBookRequest.getAuthors() == null ||
