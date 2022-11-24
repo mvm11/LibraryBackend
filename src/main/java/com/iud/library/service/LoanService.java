@@ -12,6 +12,8 @@ import com.iud.library.repository.LoanRepository;
 import com.iud.library.request.loan.SavingLoanRequest;
 import com.iud.library.request.loan.UpdatingLoanRequest;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.TaskScheduler;
@@ -44,6 +46,8 @@ public class LoanService implements LoanGateway {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    private static final Logger log = LoggerFactory.getLogger(LoanService.class);
 
     @Override
     public LoanDTO saveLoan(SavingLoanRequest savingLoanRequest) {
@@ -129,7 +133,7 @@ public class LoanService implements LoanGateway {
             //Load the cron expression from database
             taskScheduler.schedule(
                     () -> startJob(copy, libraryUser),
-                    new Date(OffsetDateTime.now().plusSeconds(691200).toInstant().toEpochMilli())
+                    new Date(OffsetDateTime.now().plusSeconds(2).toInstant().toEpochMilli())
             );
 
             return convertLoanToDTO(loan);
@@ -140,6 +144,7 @@ public class LoanService implements LoanGateway {
         if(copy.isLend()){
             libraryUser.setCanBorrowBooks(false);
             libraryUserRepository.save(libraryUser);
+            log.info("the user " + libraryUser.getName() +" has not returned the copy " + copy.getEditionNumber() + ", so he will not be able to lend more books until he returns it.");
         }
     }
     private void validateAvailableCopies(List<Copy> copies) {
