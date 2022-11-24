@@ -1,15 +1,14 @@
 package com.iud.library.repository;
 
-import com.iud.library.entity.Book;
+import com.iud.library.entity.Subject;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface BookRepository extends JpaRepository<Book, Integer> {
+public interface SubjectRepository extends JpaRepository<Subject, Integer> {
 
-    public List<Book> findByCategoryId(Integer categoryId);
+    List<Subject> findByBookId(Integer bookId);
 
 }
-
