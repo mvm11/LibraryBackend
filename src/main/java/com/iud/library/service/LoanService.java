@@ -9,7 +9,8 @@ import com.iud.library.repository.BookRepository;
 import com.iud.library.repository.CopyRepository;
 import com.iud.library.repository.LibraryUserRepository;
 import com.iud.library.repository.LoanRepository;
-import com.iud.library.request.SavingLoanRequest;
+import com.iud.library.request.loan.SavingLoanRequest;
+import com.iud.library.request.loan.UpdatingLoanRequest;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -48,7 +49,10 @@ public class LoanService implements LoanGateway {
     public LoanDTO saveLoan(SavingLoanRequest savingLoanRequest) {
 
         // Validate if the user exists
-        LibraryUser libraryUser = getLibraryUserByDni(savingLoanRequest);
+        LibraryUser libraryUser = getLibraryUserByDni(savingLoanRequest.getLibraryUserDni());
+
+        //Validate if  the user can borrow books
+        validateUseBorrowBooks(libraryUser);
 
         // Validate if there are available copies
         List<Copy> copies = getAvailableCopies(savingLoanRequest);
@@ -70,6 +74,12 @@ public class LoanService implements LoanGateway {
             return convertLoanToDTO(loan);
         }
         return null;
+    }
+
+    private void validateUseBorrowBooks(LibraryUser libraryUser) {
+        if(Boolean.FALSE.equals(libraryUser.getCanBorrowBooks())){
+            throw new LibraryException(HttpStatus.BAD_REQUEST, "Actually the user with the dni: " + libraryUser.getDni() + " cannot borrow books");
+        }
     }
 
     private List<Copy> getAvailableCopies(SavingLoanRequest savingLoanRequest) {
@@ -102,7 +112,7 @@ public class LoanService implements LoanGateway {
             //Load the cron expression from database
             taskScheduler.schedule(
                     () -> startJob(copy, libraryUser),
-                    new Date(OffsetDateTime.now().plusSeconds(5).toInstant().toEpochMilli())
+                    new Date(OffsetDateTime.now().plusSeconds(691200).toInstant().toEpochMilli())
             );
 
             return convertLoanToDTO(loan);
@@ -121,13 +131,13 @@ public class LoanService implements LoanGateway {
         }
     }
 
-    private LibraryUser getLibraryUserByDni(SavingLoanRequest savingLoanRequest) {
+    private LibraryUser getLibraryUserByDni(String userDni) {
         return libraryUserRepository
                 .findAll()
                 .stream()
-                .filter(libraryUser1 -> libraryUser1.getDni().equalsIgnoreCase(savingLoanRequest.getLibraryUserDni()))
+                .filter(libraryUser1 -> libraryUser1.getDni().equalsIgnoreCase(userDni))
                 .findFirst()
-                .orElseThrow(() -> new NotFoundException("User", "dni", savingLoanRequest.getLibraryUserDni()));
+                .orElseThrow(() -> new NotFoundException("User", "dni", userDni));
     }
 
     private Copy getCopy(Integer copyId) {
@@ -146,10 +156,32 @@ public class LoanService implements LoanGateway {
     }
 
     @Override
-    public LoanDTO updateLoan(Integer copyId, Integer loanId, LoanDTO loanDTO) {
-        return null;
+    public LoanDTO returnBook(UpdatingLoanRequest updatingLoanRequest) {
+        // Validate if the user exists
+        LibraryUser libraryUser = getLibraryUserByDni(updatingLoanRequest.getLibraryUserDni());
+        Loan loan = getLoanByEditionNumber(updatingLoanRequest, libraryUser);
+        Copy copy = loan.getCopy();
+        validateIfCopyIsLend(copy);
+        libraryUser.setCanBorrowBooks(true);
+        copy.setLend(false);
+        copyRepository.save(copy);
+        libraryUserRepository.save(libraryUser);
+        loanRepository.save(loan);
+        return convertLoanToDTO(loan);
     }
 
+    private static Loan getLoanByEditionNumber(UpdatingLoanRequest updatingLoanRequest, LibraryUser libraryUser) {
+        return libraryUser.getLoans().stream()
+                .filter(loan1 -> loan1.getCopy().getEditionNumber().equalsIgnoreCase(updatingLoanRequest.getEditionNumber()))
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException("Copy", "edition number", updatingLoanRequest.getEditionNumber()));
+    }
+
+    private void validateIfCopyIsLend(Copy copy) {
+        if(!copy.isLend()){
+            throw new LibraryException(HttpStatus.BAD_REQUEST, "Actually that copy book is not lend");
+        }
+    }
     @Override
     public void deleteLoan(Integer bookId, Integer copyId) {
 

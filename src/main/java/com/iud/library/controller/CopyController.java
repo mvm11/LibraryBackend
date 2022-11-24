@@ -1,7 +1,7 @@
 package com.iud.library.controller;
 
 import com.iud.library.dto.CopyDTO;
-import com.iud.library.request.UpdatingCopyRequest;
+import com.iud.library.request.copy.UpdatingCopyRequest;
 import com.iud.library.service.CopyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

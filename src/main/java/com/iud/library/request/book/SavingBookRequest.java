@@ -1,4 +1,4 @@
-package com.iud.library.request;
+package com.iud.library.request.book;
 
 
 import com.iud.library.entity.Author;

@@ -1,8 +1,8 @@
 package com.iud.library.gateway;
 
 import com.iud.library.dto.BookDTO;
-import com.iud.library.request.SavingBookRequest;
-import com.iud.library.request.UpdatingBookRequest;
+import com.iud.library.request.book.SavingBookRequest;
+import com.iud.library.request.book.UpdatingBookRequest;
 
 import java.util.List;
 

@@ -2,7 +2,7 @@ package com.iud.library.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.iud.library.request.SavingBookRequest;
+import com.iud.library.request.book.SavingBookRequest;
 import lombok.*;
 
 import javax.persistence.*;

@@ -1,7 +1,8 @@
 package com.iud.library.controller;
 
 import com.iud.library.dto.LoanDTO;
-import com.iud.library.request.SavingLoanRequest;
+import com.iud.library.request.loan.SavingLoanRequest;
+import com.iud.library.request.loan.UpdatingLoanRequest;
 import com.iud.library.service.LoanService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,4 +26,13 @@ public class LoanController {
 
         return new ResponseEntity<>(loanService.saveLoan(savingLoanRequest), HttpStatus.CREATED);
     }
+
+    @PreAuthorize("hasRole('STUDENT')")
+    @PutMapping("/returnBook")
+    public ResponseEntity<LoanDTO> returnBook(@Valid  @RequestBody UpdatingLoanRequest updatingLoanRequest){
+
+        return new ResponseEntity<>(loanService.returnBook(updatingLoanRequest), HttpStatus.CREATED);
+    }
+
+
 }
