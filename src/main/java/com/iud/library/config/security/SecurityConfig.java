@@ -1,4 +1,4 @@
-package com.iud.library.config;
+package com.iud.library.config.security;
 
 import com.iud.library.security.CustomUserDetailsService;
 import com.iud.library.security.JwtAuthenticationEntryPoint;
@@ -49,7 +49,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests().antMatchers(HttpMethod.GET, "/book/**").permitAll()
-                .antMatchers("/auth/**").permitAll()
+                .antMatchers(
+                        "/auth/**,",
+                        "/swagger-resources/**",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html",
+                        "/v2/api-docs",
+                        "/webjars/**")
+                .permitAll()
                 .anyRequest()
                 .authenticated();
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
