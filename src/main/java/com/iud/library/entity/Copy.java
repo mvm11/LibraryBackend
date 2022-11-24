@@ -1,7 +1,6 @@
 package com.iud.library.entity;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,7 +9,6 @@ import javax.persistence.*;
 @Entity
 @Table(name = "copies")
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Copy {
@@ -19,14 +17,11 @@ public class Copy {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name="editionNumber", nullable = false)
+    @Column(name = "editionNumber", length = 30, nullable = false, unique = true)
     private String editionNumber;
 
-    @Column(name="state", nullable = false)
+    @Column(name="state")
     private String state;
-
-    @OneToOne(mappedBy = "copy")
-    private Loan loan;
 
     private boolean isLend;
 

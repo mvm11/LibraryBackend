@@ -1,26 +1,30 @@
 package com.iud.library.entity;
 
+
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 
 @Entity
-@Table(name = "authors")
-@Data
+@Table(name = "subjects")
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Author {
-
+public class Subject {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
-    @Column(name = "authorName", nullable = false, unique = true)
-    private String authorName;
+
+    @Column(name = "subjectName", length = 30, nullable = false, unique = true)
+    private String subjectName;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id", nullable = false)
     private Book book;
+
 }

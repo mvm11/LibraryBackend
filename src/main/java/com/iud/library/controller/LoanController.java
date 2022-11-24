@@ -1,7 +1,7 @@
 package com.iud.library.controller;
 
-import com.iud.library.dto.CopyDTO;
 import com.iud.library.dto.LoanDTO;
+import com.iud.library.request.SavingLoanRequest;
 import com.iud.library.service.LoanService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,8 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @RestController
-@RequestMapping("/books/copies")
+@RequestMapping("/loan")
 @CrossOrigin(origins = "*")
 public class LoanController {
 
@@ -18,11 +20,9 @@ public class LoanController {
     private LoanService loanService;
 
     @PreAuthorize("hasRole('STUDENT')")
-    @PostMapping("/{copyId}/loans/saveLoan")
-    public ResponseEntity<LoanDTO> saveLoan
-            (@PathVariable(value = "copyId") Integer copyId, @RequestBody LoanDTO loanDTO){
+    @PostMapping("/saveLoan")
+    public ResponseEntity<LoanDTO> saveLoan(@Valid  @RequestBody SavingLoanRequest savingLoanRequest){
 
-        return new ResponseEntity<>(loanService.saveLoan(copyId, loanDTO), HttpStatus.CREATED);
-
+        return new ResponseEntity<>(loanService.saveLoan(savingLoanRequest), HttpStatus.CREATED);
     }
 }

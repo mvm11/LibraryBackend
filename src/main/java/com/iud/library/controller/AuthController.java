@@ -5,8 +5,8 @@ import com.iud.library.dto.LoginDTO;
 import com.iud.library.dto.RegisterDTO;
 import com.iud.library.entity.LibraryUser;
 import com.iud.library.entity.Role;
+import com.iud.library.repository.LibraryUserRepository;
 import com.iud.library.repository.RoleRepository;
-import com.iud.library.repository.UserRepository;
 import com.iud.library.security.JWTAuthResponseDTO;
 import com.iud.library.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,7 @@ public class AuthController {
     private AuthenticationManager authenticationManager;
 
     @Autowired
-    private UserRepository userRepository;
+    private LibraryUserRepository libraryUserRepository;
 
     @Autowired
     private RoleRepository roleRepository;
@@ -62,11 +62,11 @@ public class AuthController {
     @PostMapping("/registerAdmin")
     public ResponseEntity<?> registerAdmin(@RequestBody RegisterDTO registerDTO){
 
-        if(userRepository.existsByUsername(registerDTO.getUsername())) {
+        if(libraryUserRepository.existsByUsername(registerDTO.getUsername())) {
             return new ResponseEntity<>("That username already exists ",HttpStatus.BAD_REQUEST);
         }
 
-        if(userRepository.existsByEmail(registerDTO.getEmail())) {
+        if(libraryUserRepository.existsByEmail(registerDTO.getEmail())) {
             return new ResponseEntity<>("That email already exists ",HttpStatus.BAD_REQUEST);
         }
 
@@ -82,10 +82,10 @@ public class AuthController {
                 .password(passwordEncoder.encode(registerDTO.getPassword()))
                 .build();
 
-        Role roles = roleRepository.findByName(AppConstants.ROLE_ADMIN).get();
-        libraryUser.setRoles(Collections.singleton(roles));
+        Role adminRole = roleRepository.findByName(AppConstants.ROLE_ADMIN).get();
+        libraryUser.setRole(adminRole);
 
-        userRepository.save(libraryUser);
+        libraryUserRepository.save(libraryUser);
         return new ResponseEntity<>("The admin has been register successful",HttpStatus.OK);
     }
 
@@ -95,11 +95,11 @@ public class AuthController {
     @PostMapping("/registerTeacher")
     public ResponseEntity<?> registerTeacher(@RequestBody RegisterDTO registerDTO){
 
-        if(userRepository.existsByUsername(registerDTO.getUsername())) {
+        if(libraryUserRepository.existsByUsername(registerDTO.getUsername())) {
             return new ResponseEntity<>("That username already exists ",HttpStatus.BAD_REQUEST);
         }
 
-        if(userRepository.existsByEmail(registerDTO.getEmail())) {
+        if(libraryUserRepository.existsByEmail(registerDTO.getEmail())) {
             return new ResponseEntity<>("That email already exists ",HttpStatus.BAD_REQUEST);
         }
 
@@ -115,10 +115,10 @@ public class AuthController {
                 .password(passwordEncoder.encode(registerDTO.getPassword()))
                 .build();
 
-        Role roles = roleRepository.findByName(AppConstants.ROLE_TEACHER).get();
-        libraryUser.setRoles(Collections.singleton(roles));
+        Role teacherRole = roleRepository.findByName(AppConstants.ROLE_TEACHER).get();
+        libraryUser.setRole(teacherRole);
 
-        userRepository.save(libraryUser);
+        libraryUserRepository.save(libraryUser);
         return new ResponseEntity<>("The teacher has been register successful",HttpStatus.OK);
     }
 
@@ -126,12 +126,12 @@ public class AuthController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/registerStudent")
-    public ResponseEntity<?> registerUser(@RequestBody RegisterDTO registerDTO){
-        if(userRepository.existsByUsername(registerDTO.getUsername())) {
+    public ResponseEntity<?> registerStudent(@RequestBody RegisterDTO registerDTO){
+        if(Boolean.TRUE.equals(libraryUserRepository.existsByUsername(registerDTO.getUsername()))) {
             return new ResponseEntity<>("That username already exists ",HttpStatus.BAD_REQUEST);
         }
 
-        if(userRepository.existsByEmail(registerDTO.getEmail())) {
+        if(Boolean.TRUE.equals(libraryUserRepository.existsByEmail(registerDTO.getEmail()))) {
             return new ResponseEntity<>("That email already exists ",HttpStatus.BAD_REQUEST);
         }
 
@@ -147,10 +147,10 @@ public class AuthController {
                 .password(passwordEncoder.encode(registerDTO.getPassword()))
                 .build();
 
-        Role roles = roleRepository.findByName(AppConstants.ROLE_STUDENT).get();
-        libraryUser.setRoles(Collections.singleton(roles));
+        Role studentRole = roleRepository.findByName(AppConstants.ROLE_STUDENT).get();
+        libraryUser.setRole(studentRole);
 
-        userRepository.save(libraryUser);
+        libraryUserRepository.save(libraryUser);
         return new ResponseEntity<>("The student has been register successful",HttpStatus.OK);
     }
 

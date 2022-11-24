@@ -1,14 +1,16 @@
 package com.iud.library.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.iud.library.entity.Book;
+import lombok.*;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.List;
 
-@Data
+
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,5 +20,7 @@ public class CategoryDTO {
 
     @NotEmpty
     @Size(min = 2, message = "The category's name should have at least two characters")
-    private String name;
+    private String categoryName;
+
+    private List<Book> books = new ArrayList<>();
 }

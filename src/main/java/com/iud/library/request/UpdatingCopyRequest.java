@@ -1,4 +1,4 @@
-package com.iud.library.dto;
+package com.iud.library.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginDTO {
+public class UpdatingCopyRequest {
 
-    private String usernameOrEmail;
-    private String password;
+    private String editionNumber;
+    private String state;
 }

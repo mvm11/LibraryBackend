@@ -1,85 +1,154 @@
 package com.iud.library.service;
 
+import com.iud.library.common.exception.LibraryException;
 import com.iud.library.common.exception.NotFoundException;
 import com.iud.library.dto.BookDTO;
-import com.iud.library.dto.BookResponse;
-import com.iud.library.entity.Author;
-import com.iud.library.entity.Book;
-import com.iud.library.entity.Category;
+import com.iud.library.dto.CategoryDTO;
+import com.iud.library.entity.*;
 import com.iud.library.gateway.BookGateway;
-import com.iud.library.repository.BookRepository;
+import com.iud.library.repository.*;
+import com.iud.library.request.SavingBookRequest;
+import com.iud.library.request.UpdatingBookRequest;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.time.OffsetDateTime;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class BookService implements BookGateway {
 
-
     @Autowired
     private BookRepository bookRepository;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
+
+    @Autowired
+    private AuthorRepository authorRepository;
+
+    @Autowired
+    private SubjectRepository subjectRepository;
+
+    @Autowired
+    private PublisherRepository publisherRepository;
 
     @Autowired
     private ModelMapper modelMapper;
 
     @Override
-    public BookResponse findAllBooks(int pageNumber, int pageQuantityOfBooks, String sortBookBy) {
+    public BookDTO createBook(Integer categoryId, SavingBookRequest savingBookRequest) {
 
-        // Create Pageable
-        Pageable pageable = PageRequest.of(pageNumber, pageQuantityOfBooks, Sort.by(sortBookBy));
+        Book book = new Book();
 
-        // Add pageable to the method findAll
-        Page<Book> bookPages = bookRepository.findAll(pageable);
-        // Get all books from the repository
-        List<Book> bookList = bookPages.getContent();
+        Category category = getCategory(categoryId);
 
-        // Convert each book of the bookList to a DTO
-        List<BookDTO> bookContentList = bookList.stream()
-                .map(this::convertBookToDTO)
-                .collect(Collectors.toList());
+        Publisher publisher = getPublisherByBookRequest(savingBookRequest);
 
-        return BookResponse.builder()
-                .bookContentList(bookContentList)
-                .pageNumber(bookPages.getNumber())
-                .pageQuantityOfBooks(bookPages.getSize())
-                .totalBooks(bookPages.getTotalElements())
-                .totalPages(bookPages.getTotalPages())
-                .isTheLastOnePage(bookPages.isLast())
-                .build();
+        validatePublisher(savingBookRequest, publisher);
+
+        validateBookRequest(savingBookRequest);
+
+        book.setTitle(savingBookRequest.getTitle());
+        book.setIsbn(savingBookRequest.getIsbn());
+        book.setNumberOfPages(savingBookRequest.getNumberOfPages());
+        book.setFormat(savingBookRequest.getFormat());
+        book.setPublisher(publisher);
+        book.setCategory(category);
+
+        //Save publisher
+        publisherRepository.save(publisher);
+
+        // Save Book into the repository
+        bookRepository.save(book);
+
+        // save subjects
+        savingBookRequest.getSubjects().forEach(subject -> subject.setBook(book));
+        subjectRepository.saveAll(savingBookRequest.getSubjects());
+
+        // save authors
+        savingBookRequest.getAuthors().forEach(author -> author.setBook(book));
+        authorRepository.saveAll(savingBookRequest.getAuthors());
+
+
+
+        //setting values
+        book.setSubjects(savingBookRequest.getSubjects());
+        book.setAuthors(savingBookRequest.getAuthors());
+
+        // Parse from Entity to DTO
+        return convertBookToDTO(book);
+    }
+
+    private Category getCategory(Integer categoryId) {
+        return categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new NotFoundException("Category", "id", categoryId));
+    }
+
+    private Publisher getPublisherByBookRequest(SavingBookRequest savingBookRequest) {
+        return publisherRepository.findAll()
+                .stream()
+                .filter(publisher1 -> publisher1.getPublisherName().equalsIgnoreCase(savingBookRequest.getPublisherName()))
+                .findFirst()
+                .orElse(new Publisher());
+    }
+
+    private void validatePublisher(SavingBookRequest savingBookRequest, Publisher publisher) {
+        if(publisher.getPublisherName() == null){
+            publisher.setPublisherName(savingBookRequest.getPublisherName());
+        }
+    }
+
+    private void validateBookRequest(SavingBookRequest savingBookRequest) {
+        if(validateBookRequestFields(savingBookRequest)){
+            throw new LibraryException(HttpStatus.BAD_REQUEST, "subjects and authors cannot be null");
+        }
     }
 
     @Override
-    public BookDTO findBookById(Integer bookId) {
-        // Search the book by id into the repository
-        Book book = getBook(bookId);
+    public List<BookDTO> findBookByCategory(Integer categoryId) {
+        List<Book> books = bookRepository.findByCategoryId(categoryId);
+        return books.stream()
+                .map(this::convertBookToDTO)
+                .collect(Collectors.toList());
+    }
 
+    @Override
+    public BookDTO findBookById(Integer categoryId, Integer bookId) {
+        Category category = getCategory(categoryId);
+        Book book = getBook(bookId);
+        validateCategoryAndBookId(category, book);
         return convertBookToDTO(book);
     }
 
     @Override
     public List<BookDTO> findBookByPublisher(String publisher) {
         List<Book> bookList = bookRepository.findAll();
-
         List<Book> bookListFilteredByPublisher = filterBookByPublisher(publisher, bookList);
-
         return validateFilteredBook(bookListFilteredByPublisher, "publisher", publisher);
     }
 
     @Override
-    public List<BookDTO> findBookByCategory(String category) {
+    public List<BookDTO> findBookByCategory(String categoryName) {
+        Category category = getCategoryByCategoryName(categoryName);
+        return category.getBooks().stream()
+                .map(this::convertBookToDTO)
+                .collect(Collectors.toList());
+    }
 
-        List<Book> bookList = bookRepository.findAll();
-
-        List<Book> bookListFilteredByCategory = filterBookByCategory(category, bookList);
-
-        return validateFilteredBook(bookListFilteredByCategory, "category", category);
+    private Category getCategoryByCategoryName(String categoryName) {
+        return categoryRepository.findAll()
+                .stream()
+                .filter(category1 -> category1.getCategoryName().equalsIgnoreCase(categoryName))
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException("category", "name", categoryName));
     }
 
     @Override
@@ -94,23 +163,47 @@ public class BookService implements BookGateway {
 
     @Override
     public List<BookDTO> findBookByAuthor(String author) {
-
         List<Book> bookList = bookRepository.findAll();
-
         List<Book> bookListFilteredByAuthor = filterBookByAuthor(author, bookList);
-
         return validateFilteredBook(bookListFilteredByAuthor, "author", author);
     }
 
+    @Override
+    public List<BookDTO> findBookBySubject(String subject) {
+        List<Book> bookList = bookRepository.findAll();
+        List<Book> bookListFilteredBySubject = filterBookBySubject(subject, bookList);
+        return validateFilteredBook(bookListFilteredBySubject, "author", subject);
+    }
+
+    private List<Book> filterBookBySubject(String subject, List<Book> bookList) {
+        Set<Subject> bookSubjects = getBookSubject(subject, bookList);
+        return validateBookSubject(subject, bookList, bookSubjects);
+    }
+
+    private List<Book> validateBookSubject(String subject, List<Book> bookList, Set<Subject> bookSubjects) {
+        if(bookSubjects.isEmpty()){
+            throw new NotFoundException("Book", "subject", subject);
+        }else{
+            return bookList.stream()
+                    .filter(book -> book.getSubjects().containsAll(bookSubjects))
+                    .collect(Collectors.toList());
+        }
+    }
+
+    private Set<Subject> getBookSubject(String subject, List<Book> bookList) {
+        return bookList.stream()
+                .map(Book::getSubjects)
+                .flatMap(Collection::stream)
+                .filter(subject1 -> subject1.getSubjectName().equalsIgnoreCase(subject))
+                .collect(Collectors.toSet());
+    }
+
     private List<Book> filterBookByAuthor(String author, List<Book> bookList) {
-
         Set<Author> bookAuthors = getBookAuthor(author, bookList);
-
         return validateBookAuthor(author, bookList, bookAuthors);
     }
 
     private List<Book> validateBookAuthor(String author, List<Book> bookList, Set<Author> bookAuthors) {
-
         if(bookAuthors.isEmpty()){
             throw new NotFoundException("Book", "author", author);
         }else{
@@ -124,7 +217,7 @@ public class BookService implements BookGateway {
         return bookList.stream()
                 .map(Book::getAuthors)
                 .flatMap(Collection::stream)
-                .filter(author1 -> author1.getName().equalsIgnoreCase(author))
+                .filter(author1 -> author1.getAuthorName().equalsIgnoreCase(author))
                 .collect(Collectors.toSet());
     }
 
@@ -146,75 +239,49 @@ public class BookService implements BookGateway {
 
     private List<Book> filterBookByPublisher(String publisher, List<Book> bookList) {
         return bookList.stream()
-                .filter(book -> book.getPublisher().equalsIgnoreCase(publisher))
+                .filter(book -> book.getPublisher().getPublisherName().equalsIgnoreCase(publisher))
                 .collect(Collectors.toList());
     }
 
-    private List<Book> filterBookByCategory(String category, List<Book> bookList) {
 
 
-        Set<Category> bookCategories = getBookCategories(category, bookList);
-
-        return validateBookCategories(category, bookList, bookCategories);
+    private boolean validateBookRequestFields(SavingBookRequest savingBookRequest) {
+        return savingBookRequest.getAuthors() == null ||
+                savingBookRequest.getAuthors().isEmpty() ||
+                savingBookRequest.getSubjects() == null ||
+                savingBookRequest.getSubjects().isEmpty();
     }
-
-    private List<Book> validateBookCategories(String category, List<Book> bookList, Set<Category> bookCategories) {
-        if(bookCategories.isEmpty()){
-            throw new NotFoundException("Book", "category", category);
-        }else{
-            return bookList.stream()
-                    .filter(book -> book.getCategories().containsAll(bookCategories))
-                    .collect(Collectors.toList());
-        }
-    }
-
-    private Set<Category> getBookCategories(String category, List<Book> bookList) {
-        return bookList.stream()
-                .map(Book::getCategories)
-                .flatMap(Collection::stream)
-                .filter(category1 -> category1.getName().equalsIgnoreCase(category))
-                .collect(Collectors.toSet());
-    }
-
     @Override
-    public BookDTO createBook(BookDTO bookDTO) {
+    public void deleteBook(Integer categoryId, Integer bookId) {
 
-        // Parse from DTO to Entity
-        Book book = convertDTOToBook(bookDTO);
-
-        // Save into the repository
-        Book newBook = bookRepository.save(book);
-
-        // Parse from Entity to DTO
-        return convertBookToDTO(newBook);
-    }
-
-    @Override
-    public void deleteBook(Integer bookId) {
-        // Get book from the repository
+        Category category  = getCategory(categoryId);
         Book book = getBook(bookId);
-        // Delete book
+
+        validateCategoryAndBookId(category, book);
+
+        bookRepository.delete(book);
+
         bookRepository.delete(book);
     }
 
     @Override
-    public BookDTO updateBook(BookDTO bookDTO, Integer bookId) {
-        // Get book from the repository
+    public BookDTO updateBook(Integer categoryId, Integer bookId, UpdatingBookRequest updatingBookRequest) {
+        Category category = getCategory(categoryId);
         Book book = getBook(bookId);
-
+        validateCategoryAndBookId(category, book);
         // Set the DTO values into the found book
-        book.setTitle(bookDTO.getTitle());
-        book.setTitle(bookDTO.getTitle());
-        book.setIsbn(bookDTO.getIsbn());
-        book.setNumberOfPages(bookDTO.getNumberOfPages());
-        book.setPublisher(bookDTO.getPublisher());
-        book.setFormat(bookDTO.getFormat());
-        book.setCategories(bookDTO.getCategories());
-        book.setAuthors(bookDTO.getAuthors());
+        book.setTitle(updatingBookRequest.getTitle());
+        book.setIsbn(updatingBookRequest.getIsbn());
+        book.setNumberOfPages(updatingBookRequest.getNumberOfPages());
+        book.setFormat(updatingBookRequest.getFormat());
+        bookRepository.save(book);
+        return convertBookToDTO(book);
+    }
 
-        Book bookUpdated = bookRepository.save(book);
-
-        return convertBookToDTO(bookUpdated);
+    private void validateCategoryAndBookId(Category category, Book book) {
+        if(!book.getCategory().getId().equals(category.getId())){
+            throw new LibraryException(HttpStatus.BAD_REQUEST, "the book does not belong to the category");
+        }
     }
 
     private Book getBook(Integer bookId) {
@@ -229,5 +296,9 @@ public class BookService implements BookGateway {
 
     private Book convertDTOToBook(BookDTO bookDTO) {return modelMapper.map(bookDTO, Book.class);
     }
+
+    private CategoryDTO convertCategoryToDTO(Category category){return modelMapper.map(category, CategoryDTO.class);}
+
+
 
 }

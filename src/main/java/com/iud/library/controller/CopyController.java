@@ -1,6 +1,7 @@
 package com.iud.library.controller;
 
 import com.iud.library.dto.CopyDTO;
+import com.iud.library.request.UpdatingCopyRequest;
 import com.iud.library.service.CopyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,21 +12,21 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/books")
+@RequestMapping("/copy")
 @CrossOrigin(origins = "*")
 public class CopyController {
 
     @Autowired
     private CopyService copyService;
 
-    @GetMapping("/{bookId}/copies/getCopies")
+    @GetMapping("/findCopies/bookId/{bookId}")
     public List<CopyDTO> findCopiesByBookId(@PathVariable(value = "bookId") Integer bookId){
 
         return copyService.findCopyByBook(bookId);
 
     }
 
-    @GetMapping("/{bookId}/copies/{copyId}/getCopy")
+    @GetMapping("/findCopy/bookId/{bookId}/copyId/{copyId}")
     public ResponseEntity<CopyDTO> findCopyById(
             @PathVariable(value = "bookId") Integer bookId,
             @PathVariable(value = "copyId") Integer copyId
@@ -47,8 +48,8 @@ public class CopyController {
     public ResponseEntity<CopyDTO> updateCopy(
             @PathVariable(value = "bookId") Integer bookId,
             @PathVariable(value = "copyId") Integer copyId,
-            @RequestBody CopyDTO copyDTO){
-        CopyDTO copyDTOUpdated = copyService.updateCopy(bookId, copyId, copyDTO);
+            @RequestBody UpdatingCopyRequest updatingCopyRequest){
+        CopyDTO copyDTOUpdated = copyService.updateCopy(bookId, copyId, updatingCopyRequest);
         return new ResponseEntity<>(copyDTOUpdated, HttpStatus.OK);
 
     }
