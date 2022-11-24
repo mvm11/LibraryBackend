@@ -1,9 +1,6 @@
 package com.iud.library.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -35,6 +32,8 @@ public class LibraryUser {
     @JoinColumn(name = "role_id")
     private Role role;
 
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     @OneToMany(mappedBy = "libraryUser", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Loan> loans = new HashSet<>();
 

@@ -13,11 +13,14 @@ import com.iud.library.request.SavingLoanRequest;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -25,6 +28,8 @@ import java.util.stream.Collectors;
 @Service
 public class LoanService implements LoanGateway {
 
+    @Autowired
+    private TaskScheduler taskScheduler;
 
     @Autowired
     private BookRepository bookRepository;
@@ -93,7 +98,21 @@ public class LoanService implements LoanGateway {
             loan.setCopy(copy);
             loan.setLibraryUser(libraryUser);
             loanRepository.save(loan);
+
+            //Load the cron expression from database
+            taskScheduler.schedule(
+                    () -> startJob(copy, libraryUser),
+                    new Date(OffsetDateTime.now().plusSeconds(5).toInstant().toEpochMilli())
+            );
+
             return convertLoanToDTO(loan);
+        }
+    }
+
+    public void startJob(Copy copy, LibraryUser libraryUser) {
+        if(copy.isLend()){
+            libraryUser.setCanBorrowBooks(false);
+            libraryUserRepository.save(libraryUser);
         }
     }
     private void validateAvailableCopies(List<Copy> copies) {

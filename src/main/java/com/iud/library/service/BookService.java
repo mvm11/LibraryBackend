@@ -25,10 +25,6 @@ import java.util.stream.Collectors;
 @Service
 public class BookService implements BookGateway {
 
-
-    @Autowired
-    private TaskScheduler taskScheduler;
-
     @Autowired
     private BookRepository bookRepository;
 
@@ -81,11 +77,7 @@ public class BookService implements BookGateway {
         savingBookRequest.getAuthors().forEach(author -> author.setBook(book));
         authorRepository.saveAll(savingBookRequest.getAuthors());
 
-        //Load the cron expression from database
-        taskScheduler.schedule(
-                this::startJob,
-                new Date(OffsetDateTime.now().plusSeconds(10).toInstant().toEpochMilli())
-        );
+
 
         //setting values
         book.setSubjects(savingBookRequest.getSubjects());
@@ -259,15 +251,6 @@ public class BookService implements BookGateway {
                 savingBookRequest.getSubjects() == null ||
                 savingBookRequest.getSubjects().isEmpty();
     }
-
-
-
-
-
-    public void startJob() {
-        System.out.println("me imprimí "+ new Date());
-    }
-
     @Override
     public void deleteBook(Integer categoryId, Integer bookId) {
 

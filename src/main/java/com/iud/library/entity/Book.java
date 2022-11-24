@@ -3,10 +3,7 @@ package com.iud.library.entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.iud.library.request.SavingBookRequest;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -49,16 +46,20 @@ public class Book {
     @JsonBackReference
     private Category category;
 
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonBackReference(value = "copies")
     private List<Copy> copies = new ArrayList<>();
 
-
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonBackReference(value = "subjects")
     private Set<Subject> subjects = new HashSet<>();
 
-
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonBackReference(value = "authors")
     private Set<Author> authors = new HashSet<>();
