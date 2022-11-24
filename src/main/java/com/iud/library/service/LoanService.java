@@ -74,7 +74,13 @@ public class LoanService implements LoanGateway {
             copy.setLend(true);
             copyRepository.save(copy);
             loan.setCopy(copy);
+            loan.setLibraryUser(libraryUser);
             loanRepository.save(loan);
+            //Load the cron expression from database
+            taskScheduler.schedule(
+                    () -> startJob(copy, libraryUser),
+                    new Date(OffsetDateTime.now().plusSeconds(2).toInstant().toEpochMilli())
+            );
             return convertLoanToDTO(loan);
         }
         return null;
