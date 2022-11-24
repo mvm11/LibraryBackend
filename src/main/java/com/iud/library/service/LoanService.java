@@ -76,6 +76,23 @@ public class LoanService implements LoanGateway {
         return null;
     }
 
+    @Override
+    public List<LoanDTO> findLoansByUserId(Integer userId) {
+        LibraryUser libraryUser = getUserById(userId);
+
+        return libraryUser.getLoans()
+                .stream()
+                .map(this::convertLoanToDTO)
+                .collect(Collectors.toList());
+    }
+
+    private LibraryUser getUserById(Integer userId) {
+        return libraryUserRepository.findAll()
+                .stream().filter(libraryUser1 -> libraryUser1.getId().equals(userId))
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException("User", "id", userId));
+    }
+
     private void validateUseBorrowBooks(LibraryUser libraryUser) {
         if(Boolean.FALSE.equals(libraryUser.getCanBorrowBooks())){
             throw new LibraryException(HttpStatus.BAD_REQUEST, "Actually the user with the dni: " + libraryUser.getDni() + " cannot borrow books");
@@ -139,20 +156,19 @@ public class LoanService implements LoanGateway {
                 .findFirst()
                 .orElseThrow(() -> new NotFoundException("User", "dni", userDni));
     }
-
-    private Copy getCopy(Integer copyId) {
-        return copyRepository.findById(copyId)
-                .orElseThrow(() -> new NotFoundException("Copy", "id", copyId));
+    @Override
+    public LoanDTO findLoanById(Integer userId, Integer loanId) {
+        LibraryUser libraryUser = getUserById(userId);
+        Loan loan = getLoanByUserAndLoanId(loanId, libraryUser);
+        return convertLoanToDTO(loan);
     }
 
-    @Override
-    public List<LoanDTO> findLoanByCopy(Integer copyId) {
-        return null;
-    }
-
-    @Override
-    public LoanDTO findLoanById(Integer copyId, Integer loanId) {
-        return null;
+    private Loan getLoanByUserAndLoanId(Integer loanId, LibraryUser libraryUser) {
+        return libraryUser.getLoans()
+                .stream()
+                .filter(loan -> loan.getId().equals(loanId))
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException("loan", "id", loanId));
     }
 
     @Override
@@ -170,7 +186,7 @@ public class LoanService implements LoanGateway {
         return convertLoanToDTO(loan);
     }
 
-    private static Loan getLoanByEditionNumber(UpdatingLoanRequest updatingLoanRequest, LibraryUser libraryUser) {
+    private Loan getLoanByEditionNumber(UpdatingLoanRequest updatingLoanRequest, LibraryUser libraryUser) {
         return libraryUser.getLoans().stream()
                 .filter(loan1 -> loan1.getCopy().getEditionNumber().equalsIgnoreCase(updatingLoanRequest.getEditionNumber()))
                 .findFirst()
@@ -181,10 +197,6 @@ public class LoanService implements LoanGateway {
         if(!copy.isLend()){
             throw new LibraryException(HttpStatus.BAD_REQUEST, "Actually that copy book is not lend");
         }
-    }
-    @Override
-    public void deleteLoan(Integer bookId, Integer copyId) {
-
     }
 
     private LoanDTO convertLoanToDTO(Loan loan){return modelMapper.map(loan, LoanDTO.class);}

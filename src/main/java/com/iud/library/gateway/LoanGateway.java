@@ -9,9 +9,8 @@ import java.util.List;
 public interface LoanGateway {
 
     LoanDTO saveLoan(SavingLoanRequest savingLoanRequest);
-    List<LoanDTO> findLoanByCopy(Integer copyId);
-    LoanDTO findLoanById(Integer copyId, Integer loanId);
+    List<LoanDTO> findLoansByUserId(Integer userId);
+    LoanDTO findLoanById(Integer userId, Integer loanId);
     LoanDTO returnBook(UpdatingLoanRequest updatingLoanRequest);
-    void deleteLoan(Integer bookId, Integer copyId);
 
 }
