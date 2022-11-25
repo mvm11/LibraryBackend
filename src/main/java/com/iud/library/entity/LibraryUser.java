@@ -1,5 +1,6 @@
 package com.iud.library.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 
 import javax.persistence.*;
@@ -35,6 +36,7 @@ public class LibraryUser {
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     @OneToMany(mappedBy = "libraryUser", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonBackReference(value = "loans")
     private Set<Loan> loans = new HashSet<>();
 
 }
