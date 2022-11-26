@@ -49,6 +49,7 @@ public class LibraryUserService implements LibraryUserGateway {
         foundLibraryUser.setUsername(updatingLibraryUserRequest.getUsername());
         foundLibraryUser.setEmail(updatingLibraryUserRequest.getEmail());
         foundLibraryUser.setPassword(updatingLibraryUserRequest.getPassword());
+        libraryUserRepository.save(foundLibraryUser);
         return convertLibraryUserToDTO(foundLibraryUser);
     }
 

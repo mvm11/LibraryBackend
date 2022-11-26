@@ -212,15 +212,7 @@ public class BookService implements BookGateway {
     }
     @Override
     public void deleteBook(Integer categoryId, Integer bookId) {
-
-        Category category  = getCategory(categoryId);
-        Book book = getBook(bookId);
-
-        validateCategoryAndBookId(category, book);
-
-        bookRepository.delete(book);
-
-        bookRepository.delete(book);
+        bookRepository.delete(getBook(bookId));
     }
 
     @Override
